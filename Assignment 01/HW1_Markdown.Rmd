@@ -1,0 +1,32 @@
+---
+title: "Homework 1 - Group XXX"
+output: html_document
+date: "2023-11-26"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction
+
+Introduction, describe the setting etc.
+
+# Exercise 1: Warm-up & Throwback
+
+Exercise 1 description etc.
+BRIEFLY: We have 150 students, *k* of them are liars. Every student must toss a coin *N* times and tell the results obtained. We have to choose *N* and establish a rule to decide whether a student is liar or not (given the *N* tosses).  
+Also, we need to design and graphically study a score function which tells how much our strategy is good for every level of *$\alpha$* (probability of claiming that a student is liar given that he's honest, false positive) and *$\beta$* (probability of claiming that a student is honest given that he's a liar, false negative).  
+Keep in mind that they depend on *q*, the probability of telling "head" for liars.  
+Lastly, add a time constraint: knowing that each flip costs 3 seconds, we want to check at least 75 students in no more than T minutes. We need to tweak the original score function to get a new one that handles this new scenario. Explore this strategy for T=15 minutes and comment findings.
+
+```{r, echo=TRUE}
+# R code for exercise 1 (first cell) HERE, echo = TRUE displays code, echo = FALSE is used when displaying plots
+# Setting number of students
+n = 150
+```
+
+# Exercise 2: Faraway, So Close!
+
+Exercise 2 description etc.
+BRIEFLY:
