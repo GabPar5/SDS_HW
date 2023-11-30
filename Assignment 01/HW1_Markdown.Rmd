@@ -23,10 +23,207 @@ Lastly, add a time constraint: knowing that each flip costs 3 seconds, we want t
 ```{r, echo=TRUE}
 # R code for exercise 1 (first cell) HERE, echo = TRUE displays code, echo = FALSE is used when displaying plots
 # Setting number of students
-n = 150
+n <- 150
 ```
 
 # Exercise 2: Faraway, So Close!
 
-Exercise 2 description etc.
-BRIEFLY:
+Exercise 2 description etc.  
+BRIEFLY: Introduction on p-Wasserstein distance between random vectors and random variables (simpler). In our setting, one random variable represent the **true population** model as a Beta distribution (with arbitrary $\alpha$ and $\beta$ parameters), while the other is an approximation of it: we'll consider a Kernel Density estimator (depending on the random sample extracted from the true population) with bandwidth as the only tunable parameter.   
+The objective is to pick an implementation of the kernel density estimator and code its corresponding quantile function. Then, pick two different $(\alpha,\beta)$ pairs and let $\epsilon>0$ be an approximation level to achieve in terms of 1-Wasserstein distance (which is a random variable itself): in other words we're searching for the largest bandwidth such that the 1-Wasserstein distance is $\leq\epsilon$.
+
+```{r, echo=TRUE}
+# R code for exercise 2 (first cell) HERE, echo = TRUE displays code, echo = FALSE is used when displaying plots
+# PART 0 - SETTING AND PREPROCESSING
+
+# We draw a sample from the true population to obtain a realization of the Kernel Density Estimator
+# alpha, beta and n are chosen arbitrarily
+alpha <- 0.5
+beta <- 2
+n <- 1000
+
+# set seed to make the example reproducible
+set.seed(5354)
+xsample <- rbeta(n, shape1=alpha, shape2=beta)
+
+# set the bandwidth (arbitrary) and obtain a realization of Kernel Density Estimator
+h <- 0.1 # this is the actual (arbitrary) bandwidth
+ysample_ep <- density(xsample, bw = h/sqrt(5), kernel = "epanechnikov")
+ysample_rec <- density(xsample, bw = h/sqrt(12), kernel = "rectangular")
+
+# Riemann sum to integrate the kernel density
+F_hr <- function(x, dens, supp, bw){
+  return((sum(dens[supp <= x]) * bw)/(sum(dens) * bw))
+}
+
+# As the kernel density estimator support falls off the interval [0,1], it is needed to crop and normalize it
+# EPANECHNIKOV
+C_ep = F_hr(x=1, dens = ysample_ep$y, supp = ysample_ep$x, bw = h) - F_hr(x=0, dens = ysample_ep$y, supp = ysample_ep$x, bw = h) # normalizing constant
+ysample_ep$y = ysample_ep$y[ysample_ep$x >= 0 & ysample_ep$x <= 1] # take correct density values
+ysample_ep$x = ysample_ep$x[ysample_ep$x >= 0 & ysample_ep$x <= 1] # crop support
+ysample_ep$y = ysample_ep$y/C_ep
+# RECTANGULAR
+C_rec = F_hr(1, dens = ysample_rec$y, supp = ysample_rec$x, bw = h) - F_hr(0, dens = ysample_rec$y, supp = ysample_rec$x, bw = h) # normalizing constant
+ysample_rec$y = ysample_rec$y[ysample_rec$x >= 0 & ysample_rec$x <= 1] # take correct density values
+ysample_rec$x = ysample_rec$x[ysample_rec$x >= 0 & ysample_rec$x <= 1] # crop support
+ysample_rec$y = ysample_rec$y/C_rec
+# Epanechnikov kernel is chosen as main ADD TO MARKDOWN PART
+```
+
+Here is an example of a random sample extracted from the true population and its respective kernel density estimation:
+
+```{r, echo=FALSE}
+par(mfrow=c(1,2))
+# Epanechnikov kernel plot
+hist(xsample, 
+     prob = T,
+     main = "Histogram of the random sample",
+     sub = "Epanechnikov kernel",
+     col = "royalblue",
+     xlab = "Value")
+lines(ysample_ep,
+     lwd = 2,
+     col = "darkred")
+# Rectangular kernel plot
+hist(xsample, 
+     prob = T,
+     main = "Histogram of the random sample",
+     sub = "Rectangular kernel",
+     col = "royalblue",
+     xlab = "Value")
+lines(ysample_rec,
+      lwd = 2,
+      col = "darkred")
+```
+
+WIP - QUANTILE FUNCTION IMPLEMENTATION  
+Given a sample (of size $n$) composed by **iid** realizations of a random variable $X$ with PDF (probability density function) $f_X(\cdot)$, the associated kernel density estimator $\hat{f_h}(\cdot)$, parametrized by the bandwidth $h$ and the kernel function $K(\cdot)$, serves as an estimator of $f_X(\cdot)$. It's defined as follows: 
+
+\begin{align}
+   \hat{f_h}(x) = \frac{1}{nh} \sum_{i=1}^{n}K\left(\frac{x_i-x}{h}\right)
+\end{align}
+
+The kernel function $K(\cdot)$ must be a PDF such that:
+
+- $\int K(x)dx = 1$
+- $\int xK(x)dx = 0$ 
+- $\int x^2K(x)dx > 0$
+
+
+If the objective is estimating the CDF (cumulative density function) $F_X(\cdot)$ of $X$, the corresponding estimator $\hat{F_h}(\cdot)$ can be computed from the kernel density estimator $\hat{f_h}(\cdot)$:
+
+\begin{align}
+   \hat{F_h}(x) = \int_{-\infty}^{x}\hat{f_h}(t)dt = \frac{1}{n} \sum_{i=1}^{n}G\left(\frac{x-x_i}{h}\right)
+\end{align}
+
+Where $G(x) = \int_{-\infty}^{x}K(t)dt$ is the CDF associated to the kernel function.  
+Equating this last estimator with $\alpha$ and solving for $x$ gives $\hat{F}_h^{-1}\!(\cdot)$, which is the corresponding estimator of the $\alpha$-quantile:
+
+\begin{align}
+   \hat{F}_h^{-1}\!(\alpha) = 
+\end{align}
+
+```{r, echo=TRUE}
+# PART 1 - COMPUTE CDF^-1 CORRESPONDING TO THE ESTIMATED KERNEL DENSITY
+# custom function which computes an approximation of the Kernel Density corresponding CDF
+F_h <- Vectorize(function(x, supp, dens){
+  f <- approxfun(supp, dens, yleft=0, yright=0)
+  cdf <- integrate(f, min(supp), x, subdivisions=1000)$value
+  return(cdf)
+}, vectorize.args='x')
+# Use the uniroot() function to compute the associated quantile function (at level "al")
+Q_h <- Vectorize(function(a, s, d){
+  tryCatch({
+           out = uniroot(function(t) F_h(t, supp = s, dens = d) - a, interval = range(s))$root
+           return(out)
+  },
+         error = function(cond){
+           # EDIT MESSAGE
+           message("Error with uniroot function in quantile estimation, value replaced with NA")
+           return(NA)
+  })
+}, vectorize.args = 'a')
+```
+
+```{r, echo=FALSE}
+par(mfrow=c(1,2))
+# Estimated vs real CDF (Epanechnikov)
+curve(F_h(x, dens = ysample_ep$y, supp= ysample_ep$x), 
+      from=0, 
+      to=1,
+      main = "CDF",
+      xlab = "q",
+      ylab = expression("P(X"<="q)"),
+      sub = "Epanechnikov Kernel")
+curve(pbeta(x, shape1=alpha, shape2=beta), 
+      from=0, 
+      to=1, 
+      col="red", 
+      add = T)
+# Estimated vs real CDF^-1 (Epanechnikov)
+curve(Q_h(x, d = ysample_ep$y, s = ysample_ep$x), 
+      from=0, 
+      to=0.99,
+      main = expression(bold("CDF"^-1)),
+      xlab = expression("P(X"<="q)"),
+      ylab = "q",
+      sub = "Epanechnikov Kernel")
+curve(qbeta(x, shape1=alpha, shape2=beta), 
+      from=0, 
+      to=1, 
+      col="red", 
+      add = T)
+```
+
+```{r, echo=FALSE}
+# # NOT WORKING WITH RECTANGULAR KERNEL
+#  par(mfrow=c(1,2))
+#  # Estimated vs real CDF (rectangular)
+#  curve(F_h(x, dens = ysample_rec$y, supp= ysample_rec$x), 
+#        from=0.15, 
+#        to=0.85,
+#        main = "CDF",
+#        xlab = "q",
+#        ylab = expression("P(X"<="q)"),
+#        sub = "Rectangular Kernel")
+#  curve(pbeta(x, shape1=alpha, shape2=beta), 
+#        from=0, 
+#        to=1, 
+#        col="red",
+#        add = T)
+#  # Estimated vs real CDF^-1 (rectangular)
+#  curve(Q_h(x, d = ysample_rec$y, s = ysample_rec$x), 
+#        from=0, 
+#        to=0.99,
+#        main = expression(bold("CDF"^-1)),
+#        xlab = expression("P(X"<="q)"),
+#        ylab = "q",
+#        sub = "Rectangular Kernel")
+#  curve(qbeta(x, shape1=alpha, shape2=beta), 
+#        from=0, 
+#        to=1, 
+#        col="red", 
+#        add = T)
+```
+
+```{r, echo=FALSE}
+# PART 2 - IMPLEMENTATION OF WASSERSTEIN DISTANCE + OPTIMIZATION (Epanechnikov)
+# Wrap all up inside one function, to study it at the variation of the bandwidth h
+WD <- function(sample, h, ker, al, bet, p){
+  # Kernel Density Estimation
+  kde <- density(sample, bw = h/sqrt(5), kernel = ker)
+  # As the kernel density estimator support falls off the interval [0,1], it is needed    to crop and normalize it
+  C = F_hr(x=1, dens = kde$y, supp = kde$x, bw = h) - F_hr(x=0, dens = kde$y, supp = kde$x, bw = h) # normalizing constant
+  kde$y = kde$y[kde$x >= 0 & kde$x <= 1] # take correct density values
+  kde$x = kde$x[kde$x >= 0 & kde$x <= 1] # crop support
+  kde$y = kde$y/C # normalize
+  
+  # wasserstein distance calculation
+  diff <- abs(qbeta(kde$x, shape1=al, shape2=bet)-Q_h(kde$x, s = kde$x, d = kde$y))^p
+  f <- approxfun(kde$x, diff, yleft=0, yright=0)
+  return((integrate(f, 0, 0.999, subdivisions=1000)$value)^(1/p))
+} # Seems to work, comment it
+
+h = 0.1
+WD(sample = xsample, h = h, ker = "epanechnikov", al = alpha, bet = beta, p = 1)
+```
