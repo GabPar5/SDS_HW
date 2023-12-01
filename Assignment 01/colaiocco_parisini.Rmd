@@ -1,0 +1,612 @@
+---
+title: "Homework 1 - Group 46"
+output: html_document
+date: "2023-12-01"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Exercise 1: Warm-up & Throwback
+
+Among 150 students, *k* of them are **liars**. The objective is to detect liars by letting every students toss a coin *N* times and analyzing the results. To do so, a rule to decide whether a student is liar or not must be established (given the results of the *N* tosses).  
+It's requested to design and graphically study a score function which tells how much the decision rule is good for every number of tosses *N*, given a target of $\alpha^*$ (probability of claiming that a student is liar given that he's honest, false positive) and $\beta^*$ (probability of claiming that a student is honest given that he's a liar, false negative).  
+Keep in mind that they depend on *q*, the probability of telling "head" for liars.  
+Lastly, it is requested to add a time constraint: knowing that each flip costs 3 seconds, we want to check at least 75 students in no more than T minutes. It is needed to tweak the original score function to get a new one that handles this new scenario. Explore this strategy for T=15 minutes and comment findings.
+
+------------------------------------------------------------------------
+
+First let's set the parameters that we will need throughout our analysis: 
+
+- The total number of students, $n=150$.
+- The number N of tosses of the coin we decided to take in a range between $30$ and $200$.
+- Our target errors $\alpha^\ast$ and $\beta^\ast$ (fundamental to our analysis) that we have chosen to set at 0.05 and 0.4 respectively. This is because by setting $\alpha^\ast=0.05$, we are stating that we are willing to accept a 5% probability of falsely accusing an honest student of being a liar, instead by setting $\beta^\ast=0.4$, indicates a higher tolerance for missing to detect liars. It means we are accepting that 40% of the actual liars might be classified as honest, so with this setting we chose that identifying a liar are considered less severe than falsely accusing an honest student.
+- The probability $p=0.5$ of the fair coin.
+- The probability we chose, $q=0.7$, to go and analyse the random variables associated with liars.
+
+
+```{r, echo=TRUE}
+
+total_students=150
+N <- sample(30:300,1)
+alpha_s = 0.05
+beta_s = 0.4
+p=0.5
+q=0.6
+
+```
+
+Now, as requested, we want to design a score function $f(N |\alpha^\ast,\beta^\ast)$, so we want a function that depends on $N$ fixed two target errors, so briefly the function will have to calculate what we can call the "distance" between the exact values of $\alpha$ and $\beta$ and the target errors $\alpha^\ast$ and $\beta^\ast$.
+Let us clarify a few points:
+
+- $\alpha$ and $\beta$ respectively, probabilities of false positives and probabilities of false negatives, are calculated each time in the score_function because they depend on $N$ and the threshold (also dependent on $N$) that we choose.
+- The threshold mentioned above we decided to calculate it dependent on N, so that it would be set empirically, thus not defining it a priori (by hand) but each time calculating it accurately dependent on $N$, in particular we used two fundamental concepts: The central limit theorem and an empirical rule which in statistics is called the 'Empirical Rule - 68-95-99.7' and we now explain how we used them:
+
+    - we apply the central limit theorem, which posits that the sum of a large number of independent and identically distributed random variables will be approximately normally distributed. Given the large number of coin flips $N$, the distribution of the sum of heads can be approximated as normal, so we utilise the empirical rule, which indicates that about 95% of the data in a normal distribution lies within two standard deviations of the mean, in this view our threshold $t$ is set to the mean plus two standard deviations of the expected distribution for an honest student flipping a fair coin. We chose to apply this method because it provides a statistically robust way to minimise the likelihood of falsely identifying honest students as liars while maintaining a reasonable sensitivity to detecting actual liars.
+
+---
+
+Focusing on the choice of this threshold, $t$, we can also graphically prove what we have asserted, as can be seen from the graph below, so comparing the empirical distribution of the coin flips with a theoretical normal distribution, we are validating the assumption that, with a large number of flips, the distribution of the number of heads will approximate normality, using the histogram to display the frequency distribution of the number of heads obtained by all students and then overlaying a normal distribution curve on the histogram and these coincide almost perfectly.
+
+
+```{r, echo=FALSE, fig.width=8, fig.height=4, fig.align='center'}
+
+set.seed(123)
+sample = rbinom(total_students, size = N, prob = p)
+hist(sample, freq = F, xlab = "Number of heads", ylab="Density", main="Sample drawn from a binomial")
+curve(dnorm(x,mean=mean(sample), sd = sd(sample)), col = "red", lwd = 3,add = T)
+
+```
+
+
+---
+
+Returning to the defined function our approach for the score_function involves setting a threshold and using this threshold to classify each student but the key aspect of our strategy is to ensure that it is statistically sound, minimises false accusations, and remains efficient in terms of the number of coin tosses required, the score_function evaluates the balance between the real and target accuracies, scaled inversely by the number of tosses. This scaling is critical as it introduces a penalty for strategies that require excessive coin tosses, thus promoting a more efficient and practical approach. The function's output, the score, serves as a crucial metric in optimising our decision rule, aiming to achieve high accuracy in classifying students while maintaining operational feasibility, so we have chosen a function to minimise because our aim is that $\alpha$ and $\beta$ come as close as possible to our targets ($\alpha^\ast$ and $\beta^\ast$), achieving in the optimisation a score equal to $0$ where this would mean having $\alpha^\ast=\alpha$ and $\beta^\ast=\beta$
+
+```{r, echo=TRUE}
+
+score_function <- function(N, p, q, alpha_s, beta_s){
+  
+  std_dev <- sqrt(N * p * (1 - p))
+  t <- N * p + 2 * std_dev
+  
+  beta <- pbinom(t, N, q)
+  alpha <- 1 - pbinom(t, N, p)
+  
+  real_TN_rate <- 1 - alpha
+  real_TP_rate <- 1 - beta
+  target_TN_rate <- 1 - alpha_s
+  target_TP_rate <- 1 - beta_s
+  
+  real_accuracy <- (real_TP_rate + real_TN_rate) / 2
+  target_accuracy <- (target_TP_rate + target_TN_rate) / 2
+  
+  score <- (target_accuracy - real_accuracy) / N
+  
+  return(score)
+}
+```
+
+Let' us's now analyse the score_function, by varying the number of $N$ and then displaying it in such a way that we can comment on it. 
+The plots proposed refer to two different pairs of parameters $(\alpha^\ast, \beta^\ast)$, let's analyse them in detail.
+First of all, both plots vary the number of coin tosses, $N$, from 30 to 300. 
+The y-axis represents the score calculated by our score_function.
+
+### Analysis of the first plot (left-one):
+
+in this case we set $(\alpha^\ast, \beta^\ast)=(0.05,0.4)$ as we said at the beginning of the report, in this way the plot shows how the score changes as $N$ increases when the strategy aims to have a low false positive rate ($5%$ chance of falsely accusing an honest student) but is more lenient with the false negative rate ($40%$ chance of failing to identify a liar).
+
+
+### Analysis of the second plot (right-one):
+
+in this case we set $(\alpha^\ast, \beta^\ast)=(0.05,0.05)$ and now the plot shows us the score's behavior for a more stringent scenario where both false positives and false negatives are intended to be kept as low as $5%$.
+
+These plots are foundamental in understanding the trade-offs involved in our decision rule. While the first scenario is more tolerant of false negatives, the second scenario underscores the importance of maintaining low rates for both false positives and false negatives. From the first plot we see how the $0$ and thus the optimum score to be achieved is reached for $N$ smaller than in the second plot this is correct considering our anlysis as we are more "tolerant" in the choice of $\beta^\ast$
+
+
+
+```{r, echo=FALSE,fig.width=8, fig.height=4, fig.align='center'}
+par(mfrow=c(1,2))
+plot(30:300, score_function(30:300, p = p, q = q, alpha_s = 0.05, beta_s = 0.4), type = "l", xlab = "N", ylab = "Score Function")
+abline(h = 0, col = "red", lwd = 2)
+plot(30:300, score_function(30:300, p = p, q = q, alpha_s = 0.05, beta_s = 0.05), type = "l", xlab = "N", ylab = "Score Function")
+abline(h = 0, col = "red", lwd = 2)
+
+```
+
+Now that we have had an idea of how our score_function behaves when $N$ varies and we have also seen using various targets what results we have, we can prove this assertion by looking at the graph numerically as well, thus seeing that for the first plot the score=0 is reached at $N=110$ while for the second plot it is reached at $N=262$.
+
+```{r, echo=TRUE}
+
+scores <- score_function(30:300, p = p, q = q, alpha_s = 0.05, beta_s = 0.4)
+min(which(round(scores, 4) == 0)) + 30 # optimal N such that alpha and beta are alpha_s and beta_s
+
+```
+
+
+```{r, echo=TRUE}
+
+scores <- score_function(30:300, p = p, q = q, alpha_s = 0.05, beta_s = 0.05)
+min(which(round(scores, 4) == 0)) + 30 # optimal N such that alpha and beta are alpha_s and beta_s
+```
+
+After this analysis we add a strict time constraint so, knowing that each flip costs 3 seconds, we want to check at least half the class in no more that T minutes, so first of all we set the parameters:
+
+- Random choice of time constrain (T_minutes)
+- Time limit in seconds (time_limit)
+
+```{r, echo=TRUE}
+T_minutes <- sample(5:30, 1) 
+time_limit <- T_minutes * 60  
+half_class <- total_students/2
+```
+
+So having the parameters we want to modify the previous function by also including this time constrain so we go on to define our new function $g(N | \alpha^\ast,\beta^\ast,T$).
+In particular, we have implemented it in the 'g_random_T' function and this function balances the need for accuracy against our pre-set error rate targets while also respecting practical constraints, such as the available time for the activity. The function's core lies in its ability to compare the achieved accuracy against our desired accuracy levels, defined by the target false positive and false negative rates. By doing so, it quantitatively measures how well our strategy aligns with our error tolerance levels and this was also what our previous 'score_function' did, our 'g_random_T' additionally, a crucial aspect of our approach is the consideration of time efficiency. The function penalises strategies that require more coin tosses than feasible within the given time frame, thus ensuring that our approach remains practical and implementable in a real classroom setting, in particular in our function if the number of tosses ($N$) exceeds the maximum flips per student allowed by the time constraint, a penalty factor is applied and this factor inversely scales the score based on how much $N$ exceeds 'max_flips_per_student', where the 'max_flips_per_student' are maximum flips per student.
+The 'g_random_T' function not only provides a robust evaluation of our classification strategy but also ensures that the strategy is viable and efficient under real-world constraints.
+
+```{r, echo=TRUE}
+g_random_T <- function(N, p, q, alpha_s, beta_s, T_minutes, seconds_per_flip = 3){
+  
+  max_flips_per_student <- time_limit / (half_class * seconds_per_flip)
+  
+  std_dev <- sqrt(N * p * (1 - p))
+  t <- N * p + 2 * std_dev
+  
+  beta <- pbinom(t, N, q)
+  alpha <- 1 - pbinom(t, N, p)
+  
+  real_TN_rate <- 1 - alpha
+  real_TP_rate <- 1 - beta
+  target_TN_rate <- 1 - alpha_s
+  target_TP_rate <- 1 - beta_s
+  
+  real_accuracy <- (real_TP_rate + real_TN_rate) / 2
+  target_accuracy <- (target_TP_rate + target_TN_rate) / 2
+  
+  score <- (target_accuracy - real_accuracy) / N
+  
+  if (N > max_flips_per_student) {
+    penalty_factor <- 1/(N-max_flips_per_student)
+    score <- score * penalty_factor
+  }
+  
+  return(list(score = score, time_limit=T_minutes))
+}
+
+```
+
+Now that we have defined our new 'g_random_T', we can go and see its performance through different plots and in particular we want to see how this new function and thus the introduction of the 'penalty_factor' affects our results.
+We wanted to analyse 6 different plots taken 3 by 3 and each triplet refers to a fixed pair of targets $\alpha^\ast$ and $\beta^\ast)$, in particular:
+
+- $(\alpha^\ast, \beta^\ast)$ =(0.05,0.4)
+- $(\alpha^\ast, \beta^\ast)$ =(0.05,0.05)
+
+The aim is to visualise how the score changes as $N$ increases and $T$ also varies, we wanted to analyse $T=15$, $T=45$ and $T=90$ for each target pair chosen.
+
+### Plots with respect to the choice $(\alpha^\ast, \beta^\ast)=(0.05,0.4)$
+
+Looking from left to right, we can analyse our plots for $T=15$, $T=45$ and $T=90$.
+
+
+```{r, echo=FALSE, fig.width=10, fig.height=5, fig.align='center'}
+
+par(mfrow=c(1,3))
+scores <- sapply(1:300, function(N) {
+  result <- g_random_T(N, p, q, alpha_s=0.05, beta_s=0.4, T_minutes=15, 3)
+  return(result$score)
+})
+
+plot(1:300, scores, type = "l", xlab = "N", ylab = "Score Function", sub = "T=15")
+abline(h = 0, col = "red", lwd = 2)
+
+scores <- sapply(1:300, function(N) {
+  result <- g_random_T(N, p, q, alpha_s=0.05, beta_s=0.4, T_minutes=45, 3)
+  return(result$score)
+})
+
+plot(1:300, scores, type = "l", xlab = "N", ylab = "Score Function",sub = "T=45")
+abline(h = 0, col = "red", lwd = 2)
+
+scores <- sapply(1:300, function(N) {
+  result <- g_random_T(N, p, q, alpha_s=0.05, beta_s=0.4, T_minutes=90, 3)
+  return(result$score)
+})
+
+plot(1:300, scores, type = "l", xlab = "N", ylab = "Score Function", sub = "T=90")
+abline(h = 0, col = "red", lwd = 2)
+```
+
+We can now comment on the results:
+
+our plots demonstrate a clear relationship between the number of tosses and the strategy's effectiveness under different time constraints and as expected, allowing more time for the coin tosses (15, 45, and 90 minutes) progressively relaxes the constraints on the number of tosses we can consider, enabling a more accurate classification strategy. The results indicate that within strict time constraints (15 minutes), the strategy's effectiveness increases rapidly with more tosses but only up to a point, beyond which the time penalty outweighs the benefits of additional tosses. As the time constraint is relaxed (45 and 90 minutes), we observe that this optimal point shifts to allow more tosses, thus offering a more flexible and potentially more accurate classification and these findings emphasize the importance of optimizing the number of coin tosses to balance the trade-off between classification accuracy and practical time constraints. They also highlight that while more tosses generally improve classification accuracy, there is a diminishing return effect influenced by the available time for the activity.
+
+### Plots respect to the choice $(\alpha^\ast, \beta^\ast)=(0.05,0.4)$
+
+Looking from left to right, we can analyse our plots for $T=15$, $T=45$ and $T=90$.
+
+```{r, echo=FALSE,fig.width=10, fig.height=5, fig.align='center'}
+par(mfrow=c(1,3))
+scores <- sapply(1:300, function(N) {
+  result <- g_random_T(N, p, q, alpha_s=0.05, beta_s=0.05, T_minutes=15, 3)
+  return(result$score)
+})
+
+plot(1:300, scores, type = "l", xlab = "N", ylab = "Score Function", sub = "T=15")
+abline(h = 0, col = "red", lwd = 2)
+
+scores <- sapply(1:300, function(N) {
+  result <- g_random_T(N, p, q, alpha_s=0.05, beta_s=0.05, T_minutes=45, 3)
+  return(result$score)
+})
+
+plot(1:300, scores, type = "l", xlab = "N", ylab = "Score Function", sub = "T=45")
+abline(h = 0, col = "red", lwd = 2)
+
+scores <- sapply(1:300, function(N) {
+  result <- g_random_T(N, p, q, alpha_s=0.05, beta_s=0.05, T_minutes=90, 3)
+  return(result$score)
+})
+
+plot(1:300, scores, type = "l", xlab = "N", ylab = "Score Function", sub = "T=90")
+abline(h = 0, col = "red", lwd = 2)
+
+```
+
+We can now comment on the results:
+
+now we've implemented a stringent error tolerance where both false positives and negatives are desired to be as low as $5%$. Our goal was to determine the optimal number of tosses $N$ that balances the accuracy of classifying liars and honest students within practical time limits. Our findings from the analysis, visualized through three plots, demonstrate that as we extend the time allowance from 15 to 90 minutes, the optimal number of tosses $N$ that maximizes our score function increases. This is expected as more tosses provide a greater data set to accurately classify students but are bounded by the time constraints. For the 15-minute time frame, we see a sharp improvement in strategy effectiveness with an increasing number of tosses, which plateaus as we reach the time limit. This plateau shifts to a higher number of tosses for the 45 and 90-minute scenarios, indicating a direct relationship between time allowance and the optimal number of tosses.
+The results suggest that for stringent error rates, the classification accuracy benefits significantly from an increased number of tosses, up to the point where time constraints impose a practical limit.
+
+In conclusion, the analysis provides critical insights into how the number of coin tosses $N$ influences the accuracy and feasibility of our classification strategy, guiding us in optimizing the procedure for real-world application.
+
+# Exercise 2: Faraway, So Close!
+
+### Description
+
+This exercise is about Kernel Density Estimators and Wasserstein Distance.  
+Given a random variable $X$ ~ Beta($\alpha,\beta$), which represents the **true population** model, it is required to implement the respective Kernel Density Estimator (with either an Epanechnikov or Rectangular kernel).  
+After coding its corresponding quantile function, it is required to implement a function to compute 1-Wasserstein distance between the true population and the density estimated.  
+The last step revolves around optimization: it's asked to find the largest bandwidth for the Kernel Density Estimator such that the 1-Wasserstein distance is under a threshold $\epsilon$ and study how they must vary together.
+
+### Initial setup
+
+As said previously, the true population model is $X$ ~ Beta($\alpha,\beta$). After setting the parameters arbitrarily ($\alpha = 0.5$ and $\beta = 2$) a random sample of size $n = 100$ is extracted from it.  
+Notice how a *seed* is set before doing so: it makes sure that this example is reproducible.
+
+
+```{r, echo=TRUE}
+# draw a sample from the true population, to obtain later a realization of the respective Kernel Density Estimator
+# alpha, beta and n are chosen arbitrarily
+alpha <- 0.5
+beta <- 2
+n <- 100
+
+# set seed to make the example reproducible
+set.seed(5356)
+xsample <- rbeta(n, shape1=alpha, shape2=beta)
+```
+
+Given a sample (of size $n$) composed by **iid** realizations of a random variable $X$ with PDF (probability density function) $f_X(\cdot)$, the associated kernel density estimator $\hat{f_h}(\cdot)$ serves as an estimator of $f_X(\cdot)$. It is parametrized by the bandwidth $h$ and the kernel function $K(\cdot)$. It's defined as follows: 
+
+\begin{align}
+   \hat{f_h}(x) = \frac{1}{nh} \sum_{i=1}^{n}K\left(\frac{x_i-x}{h}\right)
+\end{align}
+
+The kernel function $K(\cdot)$ must be a PDF such that:
+
+- $\int K(x)dx = 1$
+- $\int xK(x)dx = 0$ 
+- $\int x^2K(x)dx > 0$
+
+Some examples of kernel functions are:
+
+- Gaussian kernel: $K(x) = \frac{1}{\sqrt{2\pi}}e^{-\frac{1}{2}x^2} \qquad \forall{x}\in\mathbb{R}$
+- Epanechnikov kernel: $K(x) = \frac{3}{4}(1-x^2) \qquad \forall{-1\leq{x}\leq1}$
+- Rectangular kernel: $K(x) = \frac{1}{2} \qquad \forall{-1\leq{x}\leq1}$
+
+The next step consists in computing the Kernel Density Estimation on the previously extracted sample.  
+Because the Kernel Density Estimator places a smoothed out lump of mass of size 1/n over each data point belonging to the sample, the estimated density's support falls off the interval [0,1], which is the real support of a Beta distribution. Doing some surgery is a must: we crop the support of the kernel density and renormalize dividing it by its integral in [0,1].  
+This operation is applied considering both **Epanechnikov** and **Rectangular** kernels.
+
+```{r, echo=TRUE}
+# Code a function to obtain a realization of Kernel Density Estimator with support in [0,1] based on sample, bandwidth and kernel function
+
+# Riemann sum to integrate the kernel density
+F_hr <- function(x, dens, supp, bw){
+  return((sum(dens[supp <= x]) * bw)/(sum(dens) * bw))
+}
+
+kdebeta <- function(sample, h, ker){
+  ysample <- density(sample, bw = h/sqrt(5), kernel = ker)
+  C = F_hr(x=1, dens = ysample$y, supp = ysample$x, bw = h) - F_hr(x=0, dens = ysample$y, supp = ysample$x, bw = h) # normalizing constant
+  ysample$y = ysample$y[ysample$x >= 0 & ysample$x <= 1] # take correct density values
+ysample$x = ysample$x[ysample$x >= 0 & ysample$x <= 1] # crop support
+ysample$y = ysample$y/C
+return(list("x" = ysample$x, "y" = ysample$y))
+}
+```
+
+Let's visualize some histograms of the random sample and the estimated kernel densities, to show how different kernel functions and bandwidths affect the resulting estimation:
+
+```{r, fig.width = 10, fig.height = 6, echo=FALSE}
+par(mfrow = c(1,3))
+# Epanechnikov-Rectangular 0.03 kernel plot
+hist(xsample, 
+     prob = T,
+     main = "Histogram of the random sample",
+     sub = "Bandwidht = 0.03",
+     col = "royalblue",
+     xlab = "Value")
+lines(kdebeta(xsample, h = 0.03, ker = "epanechnikov"),
+     lwd = 2.5,
+     col = "red")
+lines(kdebeta(xsample, h = 0.03, ker = "rectangular"),
+      lwd = 2.5,
+      col = "green")
+legend("topright",
+       legend = c("Epanechnikov", "Rectangular"),
+       col = c("red", "green"),
+       lty = 1,
+       lwd = 2)
+# Epanechnikov-Rectangular 0.1 kernel plot
+hist(xsample, 
+     prob = T,
+     main = "Histogram of the random sample",
+     sub = "Bandwidth = 0.1",
+     col = "royalblue",
+     xlab = "Value")
+lines(kdebeta(xsample, h = 0.1, ker = "epanechnikov"),
+     lwd = 2.5,
+     col = "red")
+lines(kdebeta(xsample, h = 0.1, ker = "rectangular"),
+      lwd = 2.5,
+      col = "green")
+legend("topright",
+       legend = c("Epanechnikov", "Rectangular"),
+       col = c("red", "green"),
+       lty = 1,
+       lwd = 2)
+# Epanechnikov-Rectangular 0.5 kernel plot
+hist(xsample, 
+     prob = T,
+     main = "Histogram of the random sample",
+     sub = "Bandwidth = 0.5",
+     col = "royalblue",
+     xlab = "Value")
+lines(kdebeta(xsample, h = 0.5, ker = "epanechnikov"),
+     lwd = 2.5,
+     col = "red")
+lines(kdebeta(xsample, h = 0.5, ker = "rectangular"),
+      lwd = 2.5,
+      col = "green")
+legend("topright",
+       legend = c("Epanechnikov", "Rectangular"),
+       col = c("red", "green"),
+       lty = 1,
+       lwd = 2)
+```
+
+It's clear that the bandwidth is an essential parameter: low values might lead to overfitting (or undersmoothing), while high values might lead to underfitting (or oversmoothing) with respect to the sample distribution. In this example a bandwidth = 0.1 seems to be fine.  
+Also, the Epanechnikov kernel is a bit smoother than the Rectangular one, making it less prone to overfitting: for this purpose, the Rectangular kernel is excluded from successive analyses (as it is also more vulnerable to errors when integrating the respective density).
+
+### Question 1: Coding the Quantile Function
+
+A Kernel Density Estimator can be used to estimate also the CDF (cumulative density function) $F_X(\cdot)$ of a random variable $X$. The corresponding estimator $\hat{F_h}(\cdot)$ is defined as follows:
+
+\begin{align}
+   \hat{F_h}(x) = \int_{-\infty}^{x}\hat{f_h}(t)dt = \frac{1}{n} \sum_{i=1}^{n}G\left(\frac{x-x_i}{h}\right)
+\end{align}
+
+Where $G(x) = \int_{-\infty}^{x}K(t)dt$ is the CDF associated to the kernel function.  
+Equating this last estimator with a value $\alpha$ and solving for $x$ gives $\hat{F}_h^{-1}\!(\alpha)$, which is the corresponding estimator of the $\alpha$-quantile.  
+Estimating the CDF this way is achieved in R by interpolating linearly the density points estimated by the Kernel Density Estimator, then integrating the resulting function until a point $x$.  
+Subtracting this by a value $\alpha$ and passing it inside *uniroot()* function computes the $\alpha$-quantile.  
+Note that as *uniroot()* may not find the root, a *tryCatch()* statement is used to handle eventual failures.
+
+```{r, echo=TRUE}
+# computes an approximation of the CDF corresponding to the estimated Kernel Density
+F_h <- Vectorize(function(x, supp, dens){
+  f <- approxfun(supp, dens, yleft=0, yright=0)
+  cdf <- integrate(f, min(supp), x, subdivisions=1000, rel.tol = .Machine$double.eps^0.2)$value
+  return(cdf)
+}, vectorize.args='x')
+# use the uniroot() function to compute the associated quantile function (at level "a")
+Q_h <- Vectorize(function(a, s, d){
+  tryCatch({
+           out = uniroot(function(t) F_h(t, supp = s, dens = d) - a, interval = range(s))$root
+           return(out)
+  },
+         error = function(cond){
+           # suppressing the warning message for the sake of readability
+           # message("Error with uniroot function in quantile estimation. Value replaced with NA") 
+           return(NA)
+  })
+}, vectorize.args = 'a')
+```
+
+Again, let's compare the estimated $CDF$ and $CDF^{-1}$ (in <span style="color:red"> red </span>) against the ones of the true population (in <span style="color:blue"> blue </span>), by considering diverse values of bandwidth:
+
+```{r, echo=FALSE}
+par(mfrow=c(1,2))
+# Estimated vs real CDF (0.03 Epanechnikov)
+curve(F_h(x, dens = kdebeta(xsample, h = 0.03, ker = "epanechnikov")$y, supp= kdebeta(xsample, h = 0.03, ker = "epanechnikov")$x), 
+      from=0, 
+      to=0.99,
+      main = "CDF",
+      xlab = expression("q"),
+      ylab = expression("P(X"<="q)"),
+      sub = "Bandwidth = 0.03",
+      col = "red")
+curve(pbeta(x, shape1=alpha, shape2=beta), 
+      from=0, 
+      to=1, 
+      col="royalblue", 
+      add = T)
+# Estimated vs real CDF^-1 (0.03 Epanechnikov)
+curve(Q_h(x, d = kdebeta(xsample, h = 0.03, ker = "epanechnikov")$y, s = kdebeta(xsample, h = 0.03, ker = "epanechnikov")$x), 
+      from=0, 
+      to=0.99,
+      main = expression(bold("CDF"^-1)),
+      xlab = expression("P(X"<="q)"),
+      ylab = "q",
+      sub = "Bandwidth = 0.03",
+      col = "red")
+curve(qbeta(x, shape1=alpha, shape2=beta), 
+      from=0, 
+      to=1, 
+      col="royalblue", 
+      add = T)
+# Estimated vs real CDF (0.1 Epanechnikov)
+curve(F_h(x, dens = kdebeta(xsample, h = 0.1, ker = "epanechnikov")$y, supp= kdebeta(xsample, h = 0.1, ker = "epanechnikov")$x), 
+      from=0, 
+      to=0.99,
+      main = "CDF",
+      xlab = expression("q"),
+      ylab = expression("P(X"<="q)"),
+      sub = "Bandwidth = 0.1",
+      col = "red")
+curve(pbeta(x, shape1=alpha, shape2=beta), 
+      from=0, 
+      to=1, 
+      col="royalblue", 
+      add = T)
+# Estimated vs real CDF^-1 (0.1 Epanechnikov)
+curve(Q_h(x, d = kdebeta(xsample, h = 0.1, ker = "epanechnikov")$y, s = kdebeta(xsample, h = 0.1, ker = "epanechnikov")$x), 
+      from=0, 
+      to=0.99,
+      main = expression(bold("CDF"^-1)),
+      xlab = expression("P(X"<="q)"),
+      ylab = "q",
+      sub = "Bandwidth = 0.1",
+      col = "red")
+curve(qbeta(x, shape1=alpha, shape2=beta), 
+      from=0, 
+      to=1, 
+      col="royalblue", 
+      add = T)
+# Estimated vs real CDF (0.5 Epanechnikov)
+curve(F_h(x, dens = kdebeta(xsample, h = 0.5, ker = "epanechnikov")$y, supp= kdebeta(xsample, h = 0.5, ker = "epanechnikov")$x), 
+      from=0, 
+      to=0.99,
+      main = "CDF",
+      xlab = expression("q"),
+      ylab = expression("P(X"<="q)"),
+      sub = "Bandwidth = 0.5",
+      col = "red")
+curve(pbeta(x, shape1=alpha, shape2=beta), 
+      from=0, 
+      to=1, 
+      col="royalblue", 
+      add = T)
+# Estimated vs real CDF^-1 (0.5 Epanechnikov)
+curve(Q_h(x, d = kdebeta(xsample, h = 0.5, ker = "epanechnikov")$y, s = kdebeta(xsample, h = 0.5, ker = "epanechnikov")$x), 
+      from=0, 
+      to=0.99,
+      main = expression(bold("CDF"^-1)),
+      xlab = expression("P(X"<="q)"),
+      ylab = "q",
+      sub = "Bandwidth = 0.5",
+      col = "red")
+curve(qbeta(x, shape1=alpha, shape2=beta), 
+      from=0, 
+      to=1, 
+      col="royalblue", 
+      add = T)
+```
+
+These plots strengthen our hypothesis: it can be easily observed that a low bandwidth leads to overfitting (there are some spikes in the kernel density curves), while increasing too much the bandwidth leads to severe problems of underfitting (the curves are not matching at all).
+
+```{r, echo=FALSE}
+# RECTANGULAR KERNEL, NOT SURE IF IT'S A GOOD IDEA TO KEEP IT
+  # par(mfrow=c(1,2))
+  # # Estimated vs real CDF (rectangular)
+  # curve(F_h(x, dens = kdebeta(xsample, h = 0.1, ker = "rectangular")$y, supp= kdebeta(xsample, h = 0.1, ker = "rectangular")$x), 
+  #       from=0, 
+  #       to=0.99,
+  #       main = "CDF",
+  #       xlab = "q",
+  #       ylab = expression("P(X"<="q)"),
+  #       sub = "Rectangular Kernel")
+  # curve(pbeta(x, shape1=alpha, shape2=beta), 
+  #       from=0, 
+  #       to=1, 
+  #       col="red",
+  #       add = T)
+  # # Estimated vs real CDF^-1 (rectangular)
+  # curve(Q_h(x, d = kdebeta(xsample, h = 0.1, ker = "rectangular")$y, s = kdebeta(xsample, h = 0.1, ker = "rectangular")$x), 
+  #       from=0, 
+  #       to=0.99,
+  #       main = expression(bold("CDF"^-1)),
+  #       xlab = expression("P(X"<="q)"),
+  #       ylab = "q",
+  #       sub = "Rectangular Kernel")
+  # curve(qbeta(x, shape1=alpha, shape2=beta), 
+  #       from=0, 
+  #       to=1, 
+  #       col="red", 
+  #       add = T)
+```
+
+### Wasserstein Distance
+
+Given two random variables $X$ and $Y$, with their PDFs being respectively $f_X(\cdot)$ and $f_Y(\cdot)$, the p-Wasserstein distance (picking the $L_1$ metric as ground distance) between them is defined as:
+
+\begin{align}
+W_{L1,p}(X,Y) = \left(\int_0^{1}|F_X^{-1}\!(z)-F_Y^{-1}\!(z)|^p dz\right)^{1/p}
+\end{align}
+
+Using the previously computed quantile function, it is possible to measure the **1-Wasserstein distance** between the true population density and the kernel estimated one.  
+The following cell of code implements a function to compute it between a beta distribution and the relative kernel density estimated by considering a random sample drawn from it.  
+Keep in mind that it's a random variable, because it's dependent from the extracted random sample.
+
+```{r, echo=TRUE}
+# wrap all up inside one function, to calculate 1-Wasserstein distance for a given beta distribution and a random sample
+WD <- Vectorize(function(n, h, ker, al, bet, p){
+  # Extract a random sample from the true population
+  sample <- rbeta(n = n, shape1 = al, shape2 = bet)
+  # Kernel Density Estimation
+  kde <- density(sample, bw = h/sqrt(5), kernel = ker)
+  # Crop the support and normalize the estimated kernel density
+  C = F_hr(x=1, dens = kde$y, supp = kde$x, bw = h) - F_hr(x=0, dens = kde$y, supp = kde$x, bw = h) # normalizing constant
+  kde$y = kde$y[kde$x >= 0 & kde$x <= 1] # take correct density values
+  kde$x = kde$x[kde$x >= 0 & kde$x <= 1] # crop support
+  kde$y = kde$y/C # normalize
+  
+  # wasserstein distance calculation
+  diff <- abs(qbeta(kde$x, shape1=al, shape2=bet)-Q_h(kde$x, s = kde$x, d = kde$y))^p
+  f <- approxfun(kde$x, diff, yleft=0, yright=0)
+  return((integrate(f, 0, 0.999, subdivisions=100, rel.tol = .Machine$double.eps^0.2)$value)^(1/p))
+}, vectorize.args = "h") 
+```
+
+It's been stated that bandwidth is an extremely important parameter for a Kernel Density Estimator. Let's visualize how the 1-Wasserstein distance is affected by it in the following plots, taking into account different populations (pairs of parameters $\alpha,\beta$): 
+
+```{r, echo=FALSE}
+# Plot with two pairs of alpha and beta, to check if the relationship between h and the distance is affected by them.
+# Also comment about the relationship between h and the distance, taking account that it's a random variable.
+par(mfrow = c(1,2))
+M = 5
+# both < 1
+plot(seq(0.05,2,0.05), rowMeans(replicate(M, WD(n = 100, h = seq(0.05,2,0.05), ker = "epanechnikov", al = 0.5, bet = 0.5, p = 1))), type = "l", xlab = "Bandwidth", ylab = "1-Wasserstein Distance", sub = expression(paste(alpha, "= 0.5", beta, "= 0.5")))
+
+# only one < 1
+plot(seq(0.05,2,0.05), rowMeans(replicate(M, WD(n = 100, h = seq(0.05,2,0.05), ker = "epanechnikov", al = 0.5, bet = 2, p = 1))), type = "l", xlab = "Bandwidth", ylab = "1-Wasserstein Distance", sub = expression(paste(alpha, "= 0.5", beta, "= 2")))
+
+# uniform
+plot(seq(0.05,2,0.05), rowMeans(replicate(M, WD(n = 100, h = seq(0.05,2,0.05), ker = "epanechnikov", al = 1, bet = 1, p = 1))), type = "l", xlab = "Bandwidth", ylab = "1-Wasserstein Distance", sub = expression(paste(alpha, "= 1", beta, "= 1")))
+
+# both > 1
+plot(seq(0.05,2,0.05), rowMeans(replicate(M, WD(n = 100, h = seq(0.05,2,0.05), ker = "epanechnikov", al = 2, bet = 2, p = 1))), type = "l", xlab = "Bandwidth", ylab = "1-Wasserstein Distance", sub = expression(paste(alpha, "= 2", beta, "= 2")))
+```
+
+As the estimated 1-Wasserstein distance is a realization of a random variable, it's been chosen to plot the mean of $M = 5$ realizations for each population (the higher the better, but it's quite expensive in terms of computational time).  
+It is clear that the parameters of the true population are fundamental when studying the relationship between bandwidth and 1-Wasserstein distance: 
+
+- If they are **both less than one**, the true distribution is bimodal, with spikes at 0 and 1. It is clear that oversmoothing makes difficult to model the mentioned spikes. So the 1-Wasserstein distance generally increases with the bandwidth until a threshold, but it gradually decreases after it, because the oversmoothing makes easier to model the central part of the distribution, which is nearly flat;
+- If only **one of them is less than one**, the true distribution has got one spike at 0 or 1, depending on which parameter is less than one, and goes to zero at the other end of the support. Again, oversmoothing makes difficult to model this spike, so the 1-Wasserstein distance generally increases with the bandwidth;
+- If they are **both equal to one**, the true distribution is a uniform, so it's flat. That's why the 1-Wasserstein distance generally decreases while the bandwidth is increasing;
+- If they are **both greater than one**, the true distribution is unimodal. The mode is like a spike inside the support of the distribution, the 1-Wasserstein distance generally increases with the bandwidth.
+
+We've seen that modelling the uniform distribution requires a generally higher bandwidth, while it's better to keep it small if modelling another distribution derived from the beta one.
