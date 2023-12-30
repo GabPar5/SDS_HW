@@ -8,22 +8,39 @@ date: "2023-12-28"
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+# A/B tests
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+BRIEFLY: It's common practice in web-marketing to run large-scale randomized experiments called **A/B tests**. They consist in redirecting the traffic whether to one of two different versions of a website/video/media. Several data is registered, such as the *Click-Through Rate*, the *Time spent on-site*, etc.  
+This permits to test if one of the two versions is more effective than the other.  
+These experiments are **sequential**, meaning that the sample size is not fixed in advance: sampling is stopped in accordance with a pre-defined **stopping rule** (as soon as significant results are observed). So, using inferential methods that assume a fixed sample size is a **really bad idea** because it leads to p-hacking (you can find more informations inside the article in the repository).  
+To be more specific, using a **Confidence Interval** to estimate a population parameter from a sequence of IID data (**observed sequentially**) may be restrictive: the sample size must be fixed beforehand and it is impossible to know *a priori* if the selected sample size will be large enough to detect some signal of interest.  
+Instead, **Confidence Sequences** are more suitable: they can be updated whenever new data become available (sample size is chosen data-adaptively), without affecting the chosen coverage level. This makes possible to continuously monitor and adaptively stop (even at *data-dependent* times) the experiment. 
+A **Confidence Sequence** is a sequence of confidence intervals such that each of them at time $t$ (so, after observing the $t^{th}$ unit) has got a coverage probability of $1-\alpha$.  
+Given a sequence of IID observations from a 1-sub-Gaussian distribution (a distribution which tails decay at least as fast as those of a Gaussian distribution) the $1-\alpha$ confidence sequence for the population mean $\mu$ is:
+\begin{align}
+\frac{\sum_{i=1}^t X_i}{t} \pm 1.7 \cdot \sqrt{\frac{\log(\log(2t))+0.72\log(10.4/\alpha)}{t}}
+\end{align}
+Our job is to design a simulation to **compare the performance of the two introduced CSs with the classic CIs** (like Normal, Hoeffding, etc.). We must pick:
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+- one or two suitable populations to sample from
+- the simulation size
+- the target level $\alpha$
+- the minimum and maximum sample sizes ($t_{min}$ and $t_{max}$)
+- some metrics, like the *Cumulative Miscoverage Probability* and the *Running Interval Length*
 
-```{r cars}
-summary(cars)
+Comments and visualizations are mandatory.  
+Our second task consists of designing an experiment entitled **"Environmental Sound Levels and Mood"**, which investigates the relationship between the sound levels and the mood of a person over an extended period of time (so it's sequential). We must describe in details:
+
+- how to organize the data collection
+- what kind of tools/phone app/other stuff we would use
+- what kind of intervention we may try to check the effect on the person
+- the population parameter to monitor/estimate over time (and how CSs are employed in this)
+
+
+```{r, echo=TRUE}
+# FIRST CELL OF CODE
 ```
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r, echo=FALSE}
+# FIRST PLOT
 ```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
