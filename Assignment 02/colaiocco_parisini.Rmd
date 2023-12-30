@@ -20,6 +20,10 @@ Given a sequence of IID observations from a 1-sub-Gaussian distribution (a distr
 \begin{align}
 \frac{\sum_{i=1}^t X_i}{t} \pm 1.7 \cdot \sqrt{\frac{\log(\log(2t))+0.72\log(10.4/\alpha)}{t}}
 \end{align}
+Since this specific confidence sequence is *non-asymptotic*, it requires strong assumptions on the distribution of the data. So, the following *asymptotic* confidence sequence is introduced (suitable for data whose asymptotic distribution is 1-Sub-Gaussian):
+\begin{align}
+\frac{\sum_{i=1}^t X_i}{t} \pm \hat{\sigma}_t \cdot 1.7 \cdot \sqrt{\frac{\log(\log(2t))+0.72\log(10.4/\alpha)}{t}}
+\end{align}
 Our job is to design a simulation to **compare the performance of the two introduced CSs with the classic CIs** (like Normal, Hoeffding, etc.). We must pick:
 
 - one or two suitable populations to sample from

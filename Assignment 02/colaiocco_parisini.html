@@ -392,6 +392,13 @@ Gaussian distribution) the <span class="math inline">\(1-\alpha\)</span>
 confidence sequence for the population mean <span class="math inline">\(\mu\)</span> is: <span class="math display">\[\begin{align}
 \frac{\sum_{i=1}^t X_i}{t} \pm 1.7 \cdot
 \sqrt{\frac{\log(\log(2t))+0.72\log(10.4/\alpha)}{t}}
+\end{align}\]</span> Since this specific confidence sequence is
+<em>non-asymptotic</em>, it requires strong assumptions on the
+distribution of the data. So, the following <em>asymptotic</em>
+confidence sequence is introduced (suitable for data whose asymptotic
+distribution is 1-Sub-Gaussian): <span class="math display">\[\begin{align}
+\frac{\sum_{i=1}^t X_i}{t} \pm \hat{\sigma}_t \cdot 1.7 \cdot
+\sqrt{\frac{\log(\log(2t))+0.72\log(10.4/\alpha)}{t}}
 \end{align}\]</span> Our job is to design a simulation to
 <strong>compare the performance of the two introduced CSs with the
 classic CIs</strong> (like Normal, Hoeffding, etc.). We must pick:</p>
