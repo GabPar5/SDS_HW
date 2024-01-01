@@ -8,7 +8,7 @@ date: "2023-12-28"
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# A/B tests
+# A/B tests and Confidence Sequences
 
 BRIEFLY: It's common practice in web-marketing to run large-scale randomized experiments called **A/B tests**. They consist in redirecting the traffic whether to one of two different versions of a website/video/media. Several data is registered, such as the *Click-Through Rate*, the *Time spent on-site*, etc.  
 This permits to test if one of the two versions is more effective than the other.  
@@ -20,7 +20,7 @@ Given a sequence of IID observations from a 1-sub-Gaussian distribution (a distr
 \begin{align}
 \frac{\sum_{i=1}^t X_i}{t} \pm 1.7 \cdot \sqrt{\frac{\log(\log(2t))+0.72\log(10.4/\alpha)}{t}}
 \end{align}
-Since this specific confidence sequence is *non-asymptotic*, it requires strong assumptions on the distribution of the data. So, the following *asymptotic* confidence sequence is introduced (suitable for data whose asymptotic distribution is 1-Sub-Gaussian):
+Since this specific confidence sequence is *non-asymptotic*, it requires strong assumptions on the distribution of the data. So, the following *asymptotic* confidence sequence is introduced (suitable when only the asymptotic distribution of the sample mean is 1-Sub-Gaussian):
 \begin{align}
 \frac{\sum_{i=1}^t X_i}{t} \pm \hat{\sigma}_t \cdot 1.7 \cdot \sqrt{\frac{\log(\log(2t))+0.72\log(10.4/\alpha)}{t}}
 \end{align}
@@ -40,11 +40,79 @@ Our second task consists of designing an experiment entitled **"Environmental So
 - what kind of intervention we may try to check the effect on the person
 - the population parameter to monitor/estimate over time (and how CSs are employed in this)
 
+## Exercise 1: Design a simulation to compare CSs and CIs
+
+IDEAS AND METHODS ARE TAKEN FROM VARIOUS ARTICLES AND BLOGS, BUT MAINLY FROM [THIS](https://engineering.atspotify.com/2023/03/choosing-sequential-testing-framework-comparisons-and-discussions/) SPOTIFY SERIES OF ARTICLES ON SEQUENTIAL TESTING.  
+YOU CAN FIND USEFUL CODE [HERE](https://github.com/MSchultzberg/SeqTestBlog/blob/main/20230321_sim_blogg.R)
+
+The idea is to sample iteratively (until a number between t_min and t_max is reached) a random observation from two populations following a sub-gaussian distribution (maybe one gaussian and one ...). At each unit sampled the correspondent CSs and CIs are computed and informations about them are stored (like the bounds and the width). Also some others measures are calculated.  
+This approach assumes that data comes in a continuous stream, instead of coming in batches. Plots will help to check how many times the value of the true parameter is included in the intervals.
 
 ```{r, echo=TRUE}
 # FIRST CELL OF CODE
+# Calculate the normal CI (which is asymptotic if the distribution is asymptotically normal, like the maximum likelihood estimator distribution)
+ci_norm <- function(theta_ml, a, se){
+  low <- theta_ml - qnorm(1-(a/2))*se
+  up <- theta_ml + qnorm(1-(a/2))*se
+  return(c(lower = low, upper = up))
+}
+
+# Calculate the Hoeffding CI
+ci_hoef <- function(){
+  low <- 
+  up <- 
+  return(c(lower = low, upper = up))
+}
+
+# Calculate Sub-Gaussian CS
+cs_subnorm <- function(mu_est, a, csize){
+  low <- mu_est - 1.7*sqrt((log(log(2*csize))+0.72*log(10.4/a))/csize)
+  up <- mu_est + 1.7*sqrt((log(log(2*csize))+0.72*log(10.4/a))/csize)
+  return(c(lower = low, upper = up))
+}
+
+# Calculate Asymptotic Sub-Gaussian CS (which is asymptotic if the distribution is asymptotically normal, like the maximum likelihood estimator distribution)
+cs_asym_subnorm <- function(mu_est, var_est, a, csize){
+  low <- mu_est - 1.7*var_est*sqrt((log(log(2*csize))+0.72*log(10.4/a))/csize)
+  up <- mu_est + 1.7*var_est*sqrt((log(log(2*csize))+0.72*log(10.4/a))/csize)
+  return(c(lower = low, upper = up))
+}
+
+
+# ---- SIMULATION ----
+M <- 10000 # arbitrary
+t_min <- 30 # arbitrary
+t_max <- 500 # arbitrary
+true_mu <- 2 # arbitrary
+true_sd <- 1 # arbitrary
+alpha <- 0.05 # arbitrary
+
+# Initialize vectors to store sample and calculated CIs and CSs
+samp <- c()
+ci_norm_lows <- c()
+ci_norm_ups <- c()
+cs_lows <- c()
+cs_ups <- c()
+# Main loop
+# REMEMBER TO ADD ONE MORE LOOP
+set.seed(4545)
+for (t in 1:t_max){
+  samp <- c(samp, rnorm(1, mean = true_mu, sd = true_sd))
+  if (t>=t_min){
+    ci_norm_est <- ci_norm(mean(samp), alpha, sqrt(var(samp)/t))
+    cs_est <- cs_subnorm(mean(samp), alpha, t)
+    ci_norm_lows <- c(ci_norm_lows, ci_norm_est['lower'])
+    ci_norm_ups <- c(ci_norm_ups, ci_norm_est['upper'])
+    cs_lows <- c(cs_lows, cs_est['lower'])
+    cs_ups <- c(cs_ups, cs_est['upper'])
+  }
+}
 ```
 
 ```{r, echo=FALSE}
 # FIRST PLOT
+plot(t_min:t_max, ci_norm_lows, type = 'l')
+lines(t_min:t_max, ci_norm_ups, type = 'l')
+lines(t_min:t_max, cs_lows, type = 'l', col = 'red')
+lines(t_min:t_max, cs_ups, type = 'l', col = 'red')
 ```
