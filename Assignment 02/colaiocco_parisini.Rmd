@@ -66,8 +66,8 @@ ci_hoef <- function(){
 
 # Calculate Sub-Gaussian CS
 cs_subnorm <- function(mu_est, a, csize){
-  low <- mu_est - 1.7*sqrt((log(log(2*csize))+0.72*log(10.4/a))/csize)
-  up <- mu_est + 1.7*sqrt((log(log(2*csize))+0.72*log(10.4/a))/csize)
+  low <- mu_est - (1.7*sqrt((log(log(2*csize))+0.72*log(10.4/a))/csize))
+  up <- mu_est + (1.7*sqrt((log(log(2*csize))+0.72*log(10.4/a))/csize))
   return(c(lower = low, upper = up))
 }
 
@@ -78,41 +78,85 @@ cs_asym_subnorm <- function(mu_est, var_est, a, csize){
   return(c(lower = low, upper = up))
 }
 
-
 # ---- SIMULATION ----
-M <- 10000 # arbitrary
-t_min <- 30 # arbitrary
-t_max <- 500 # arbitrary
-true_mu <- 2 # arbitrary
-true_sd <- 1 # arbitrary
-alpha <- 0.05 # arbitrary
+M <- 1000 # arbitrary - simulation size
+t_min <- 100 # arbitrary - minimum sample size
+t_max <- 10000 # arbitrary - maximum sample size
+true_mu <- 0 # arbitrary - true mean
+true_sd <- 2 # arbitrary - true standard deviation
+alpha <- 0.1 # arbitrary - miscoverage probability of ci/cs
 
-# Initialize vectors to store sample and calculated CIs and CSs
-samp <- c()
-ci_norm_lows <- c()
-ci_norm_ups <- c()
-cs_lows <- c()
-cs_ups <- c()
-# Main loop
-# REMEMBER TO ADD ONE MORE LOOP
-set.seed(4545)
-for (t in 1:t_max){
-  samp <- c(samp, rnorm(1, mean = true_mu, sd = true_sd))
-  if (t>=t_min){
-    ci_norm_est <- ci_norm(mean(samp), alpha, sqrt(var(samp)/t))
-    cs_est <- cs_subnorm(mean(samp), alpha, t)
-    ci_norm_lows <- c(ci_norm_lows, ci_norm_est['lower'])
-    ci_norm_ups <- c(ci_norm_ups, ci_norm_est['upper'])
-    cs_lows <- c(cs_lows, cs_est['lower'])
-    cs_ups <- c(cs_ups, cs_est['upper'])
+# Initialize matrices to store bounds at each time
+# Initialize a vector containing the frequency of miscoverage
+ci_mat_low <-  matrix(NA, nrow = M, ncol = t_max-t_min+1)
+ci_mat_up <- matrix(NA, nrow = M, ncol = t_max-t_min+1)
+ci_mat_miscov <- matrix(0, nrow = M, ncol = t_max-t_min+1)
+cs_mat_low <- matrix(NA, nrow = M, ncol = t_max-t_min+1)
+cs_mat_up <- matrix(NA, nrow = M, ncol = t_max-t_min+1)
+cs_mat_miscov <- matrix(0, nrow = M, ncol = t_max-t_min+1)
+set.seed(445)
+for (m in 1:M){
+  samp <- c()
+  i = 0
+  for (t in 1:t_max){
+    samp <- c(samp, rnorm(1, mean = true_mu, sd = true_sd))
+    if (t >= t_min){
+      i = i+1
+      ci_norm_est <- ci_norm(mean(samp), a = alpha, se = sqrt(var(samp)/t))
+      if(ci_norm_est['lower'] > true_mu | ci_norm_est['upper'] < true_mu){
+        ci_mat_miscov[m,i] <- 1
+      }
+      cs_subnorm_est <- cs_subnorm(mean(samp), a = alpha, csize = t)
+      if(cs_subnorm_est['lower'] > true_mu | cs_subnorm_est['upper'] < true_mu){
+        cs_mat_miscov[m,i] <- 1
+      }
+      ci_mat_low[m,i] <- unname(ci_norm_est['lower'])
+      ci_mat_up[m,i] <- unname(ci_norm_est['upper'])
+      cs_mat_low[m,i] <- unname(cs_subnorm_est['lower'])
+      cs_mat_up[m,i] <- unname(cs_subnorm_est['upper'])
+    }
   }
 }
+
+# Estimate miscoverage probability at every t
+ci_miscov <- apply(ci_mat_miscov, MARGIN = 2, FUN = mean)
+cs_miscov <- apply(cs_mat_miscov, MARGIN = 2, FUN = mean)
+
+# Size at every t on average
+ci_size <- ci_mat_up - ci_mat_low
+cs_size <- cs_mat_up - cs_mat_low
+ci_avg_size <- apply(ci_size, MARGIN = 2, FUN = mean)
+cs_avg_size <- apply(cs_size, MARGIN = 2, FUN = mean)
+
+# Bounds at every t on average
+ci_avg_lows <- apply(ci_mat_low, MARGIN = 2, FUN = mean)
+ci_avg_ups <- apply(ci_mat_up, MARGIN = 2, FUN = mean)
+cs_avg_lows <- apply(cs_mat_low, MARGIN = 2, FUN = mean)
+cs_avg_ups <- apply(cs_mat_up, MARGIN = 2, FUN = mean)
+
 ```
 
-```{r, echo=FALSE}
+```{r, echo=TRUE}
+print(cs_miscov)
+print(ci_miscov)
+```
+
+```{r, echo=FALSE, fig.width=10, fig.height=4, fig.align='center'}
 # FIRST PLOT
-plot(t_min:t_max, ci_norm_lows, type = 'l')
-lines(t_min:t_max, ci_norm_ups, type = 'l')
-lines(t_min:t_max, cs_lows, type = 'l', col = 'red')
-lines(t_min:t_max, cs_ups, type = 'l', col = 'red')
+par(mfrow = c(1,3))
+
+# Bounds of intervals on average
+plot(t_min:t_max, cs_avg_lows, type = 'l', main = 'Intervals bounds on average', ylim = c(true_mu-1,true_mu+1), col = 'red')
+lines(t_min:t_max, cs_avg_ups, type = 'l', col = 'red')
+lines(t_min:t_max, ci_avg_lows, type = 'l', col = 'blue')
+lines(t_min:t_max, ci_avg_ups, type = 'l', col = 'blue')
+abline(h = 2, lwd = 1.5)
+
+# Intervals length on average
+plot(t_min:t_max, cs_avg_size, type = 'l', main = 'Intervals size on average', col = 'red')
+lines(t_min:t_max, ci_avg_size, type = 'l', col = 'blue')
+
+# Cumulative miscoverage probability over t
+plot(t_min:t_max, cs_miscov, type = 'l', col = 'red')
+lines(t_min:t_max, ci_miscov, col = 'blue')
 ```
