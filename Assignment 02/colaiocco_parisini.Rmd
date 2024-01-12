@@ -9,69 +9,96 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 # A/B tests and Confidence Sequences
-
-BRIEFLY: It's common practice in web-marketing to run large-scale randomized experiments called **A/B tests**. They consist in redirecting the traffic whether to one of two different versions of a website/video/media. Several data is registered, such as the *Click-Through Rate*, the *Time spent on-site*, etc.  
-This permits to test if one of the two versions is more effective than the other.  
-These experiments are **sequential**, meaning that the sample size is not fixed in advance: sampling is stopped in accordance with a pre-defined **stopping rule** (as soon as significant results are observed). So, using inferential methods that assume a fixed sample size is a **really bad idea** because it leads to p-hacking (you can find more informations inside the article in the repository).  
-To be more specific, using a **Confidence Interval** to estimate a population parameter from a sequence of IID data (**observed sequentially**) may be restrictive: the sample size must be fixed beforehand and it is impossible to know *a priori* if the selected sample size will be large enough to detect some signal of interest.  
-Instead, **Confidence Sequences** are more suitable: they can be updated whenever new data become available (sample size is chosen data-adaptively), without affecting the chosen coverage level. This makes possible to continuously monitor and adaptively stop (even at *data-dependent* times) the experiment. 
-A **Confidence Sequence** is a sequence of confidence intervals such that each of them at time $t$ (so, after observing the $t^{th}$ unit) has got a coverage probability of $1-\alpha$.  
-Given a sequence of IID observations from a 1-sub-Gaussian distribution (a distribution which tails decay at least as fast as those of a Gaussian distribution) the $1-\alpha$ confidence sequence for the population mean $\mu$ is:
-\begin{align}
-\frac{\sum_{i=1}^t X_i}{t} \pm 1.7 \cdot \sqrt{\frac{\log(\log(2t))+0.72\log(10.4/\alpha)}{t}}
-\end{align}
-Since this specific confidence sequence is *non-asymptotic*, it requires strong assumptions on the distribution of the data. So, the following *asymptotic* confidence sequence is introduced (suitable when only the asymptotic distribution of the sample mean is 1-Sub-Gaussian):
-\begin{align}
-\frac{\sum_{i=1}^t X_i}{t} \pm \hat{\sigma}_t \cdot 1.7 \cdot \sqrt{\frac{\log(\log(2t))+0.72\log(10.4/\alpha)}{t}}
-\end{align}
-Our job is to design a simulation to **compare the performance of the two introduced CSs with the classic CIs** (like Normal, Hoeffding, etc.). We must pick:
-
-- one or two suitable populations to sample from
-- the simulation size
-- the target level $\alpha$
-- the minimum and maximum sample sizes ($t_{min}$ and $t_{max}$)
-- some metrics, like the *Cumulative Miscoverage Probability* and the *Running Interval Length*
-
-Comments and visualizations are mandatory.  
-Our second task consists of designing an experiment entitled **"Environmental Sound Levels and Mood"**, which investigates the relationship between the sound levels and the mood of a person over an extended period of time (so it's sequential). We must describe in details:
-
-- how to organize the data collection
-- what kind of tools/phone app/other stuff we would use
-- what kind of intervention we may try to check the effect on the person
-- the population parameter to monitor/estimate over time (and how CSs are employed in this)
-
 ## Exercise 1: Design a simulation to compare CSs and CIs
 
-IDEAS AND METHODS ARE TAKEN FROM VARIOUS ARTICLES AND BLOGS, BUT MAINLY FROM [THIS](https://engineering.atspotify.com/2023/03/choosing-sequential-testing-framework-comparisons-and-discussions/) SPOTIFY SERIES OF ARTICLES ON SEQUENTIAL TESTING.  
-YOU CAN FIND USEFUL CODE [HERE](https://github.com/MSchultzberg/SeqTestBlog/blob/main/20230321_sim_blogg.R)
+It's common practice in web-marketing to run large-scale randomized experiments called **A/B tests**. They consist in redirecting the traffic whether to one of two different versions of a website/video/media. Several data is registered, such as the *Click-Through Rate* and the *Time spent on-site*.  
+This permits to test if one of the two versions is more effective than the other.  
+These experiments are **sequential**, meaning that the sample size is not fixed in advance: sampling is stopped in accordance with a pre-defined **stopping rule** (as soon as significant results are observed). So, using inferential methods that assume a fixed sample size is a **really bad idea** because it leads to p-hacking.  
+To be more specific, using a **Confidence Interval** to sequentially estimate a population parameter from a sequence of IID data (**observed sequentially**) may be restrictive: the sample size must be fixed beforehand and it is impossible to know *a priori* if the selected sample size will be large enough to detect some signal of interest.  
+Instead, **Confidence Sequences** are more suitable: they can be updated whenever new data become available (sample size is chosen data-adaptively), without affecting the chosen coverage level. This makes possible to continuously monitor and adaptively stop the experiment (even at *data-dependent* times). 
+A **Confidence Sequence** is a sequence of confidence intervals such that the coverage probability is equal to $1-\alpha$ uniformly over time.  
+Given a sequence of IID observations from a 1-sub-Gaussian distribution (a distribution which tails decay at least as fast as those of a standard Gaussian distribution) the $1-\alpha$ confidence sequence for the population mean $\mu$ is:
+\begin{align}
+\frac{\sum_{i=1}^t X_i}{t} \pm 1.7 \cdot \sqrt{\frac{\log(\log(2t))+0.72\log(5.2/\alpha)}{t}}
+\end{align}
+Since this specific confidence sequence is *non-asymptotic*, it requires strong assumptions on the distribution of the data. So, the following *asymptotic* confidence sequence is introduced (suitable when the data distribution is asymptotically 1-Sub-Gaussian):
+\begin{align}
+\frac{\sum_{i=1}^t X_i}{t} \pm \hat{\sigma}_t \cdot 1.7 \cdot \sqrt{\frac{\log(\log(2t))+0.72\log(5.2/\alpha)}{t}}
+\end{align}
+where $\hat{\sigma}_t$ is the sample variance at time t.  
+Our job is to design a simulation to **compare the performance of the two introduced CSs with the classic CIs** (like Normal, Hoeffding, Chebyshev, etc.). Before performing the simulations, it is crucial to choose the following items:
 
-The idea is to sample iteratively (until a number between t_min and t_max is reached) a random observation from two populations following a sub-gaussian distribution (maybe one gaussian and one ...). At each unit sampled the correspondent CSs and CIs are computed and informations about them are stored (like the bounds and the width). Also some others measures are calculated.  
-This approach assumes that data comes in a continuous stream, instead of coming in batches. Plots will help to check how many times the value of the true parameter is included in the intervals.
+- one or two suitable populations to sample from
+- the simulation size ($M$)
+- the target level ($\alpha$)
+- the minimum and maximum sample sizes ($t_{min}$ and $t_{max}$)
+- some metrics to evaluate
 
-```{r, echo=TRUE}
+To choose any suitable population for the simulation, it is crucial to understand what does it mean that a distribution is 1-Sub-Gaussian. Generally a process $S_t$ is said to be $l_0$-Sub-$\psi$ with variance process $V_t$ (where $l_0 \geq 1$ and $\psi$ is a function with support $[0,\lambda_{max})$) if $\forall \lambda \in [0,\lambda_{max})$ there exists a supermartingale $L_t(\lambda)$ such that: 
+
+- $L_0(\lambda) \leq l_0$ a.s. (almost surely)
+- $\exp\{\lambda S_t - \psi(\lambda)V_t\} \leq L_t(\lambda)$ a.s. $\forall t$  
+
+To be more precise, $S_t$ is said to be $l_0$-Sub-Gaussian if it is Sub-$\psi_N$, where:
+\begin{align}
+\psi_N = \frac{\lambda^2}{2} \quad \text{for} \; 0 \leq \lambda \leq \infty (= \lambda_{max})
+\end{align}
+
+This translates to saying that the real-valued random variable $X$ is said to be $l_0$-Sub-Gaussian if:
+\begin{align}
+\mathbb{E}[\exp(t\cdot X)] \leq \exp\left(\frac{l_0^2 t^2}{2}\right)
+\end{align}
+Which means that there is a positive number $l_0$ such that **the Laplace transform of $X$ is dominated by the Laplace transform of a Gaussian random variable with mean zero and variance $l_0^2$**. This leads to an important result, which states that **if $X$ is $l_0$-Sub-Gaussian then its expected value is zero and its variance is at most equal to $l_0^2$**.  
+So, it is important that the chosen population has got a mean equal to zero and a variance at most equal to 1 to use the provided Confidence Sequence.  
+Among the possible choices, we've decided to use the **Rademacher Distribution** and the **Uniform Distribution with a symmetric support**. They both have got an expected value equal to zero, and a variance below 1. Also, their supports are bounded, making us able to extend the comparison to the **Hoeffding Confidence Interval**.  
+The number of repetitions of the simulation must be high, so we've fixed it to be 1000.  
+The target level must be realistic: no one wants an high miscoverage probability, so we've set it to be 0.1.  
+Since the A/B tests usually involve a high number of people, we've chosen to start the simulation from a sample of size 100, increasing it by one unit at a time until its size becomes 10000.  
+We've decided to evaluate the performance of the intervals by calculating *Cumulative Miscoverage Probability* (how frequently the analyzed intervals do not capture the true mean at different times) and *Running Interval Length* (how large the intervals are, on average, at different times).  
+Since the two chosen populations are 1-Sub-Gaussian, it is not necessary to evaluate the performances of the asymptotic Confidence Sequence.  
+Our choices and explanations are backed by some papers, which you can read at the bottom of this page. Please note that the following cell of code was run only once with a fixed seed and the data was stored in a csv file because the **simulation runtime is high**.
+
+
+### References
+- [Time-uniform Chernoff bounds via nonnegative supermartingales](https://arxiv.org/pdf/1808.03204.pdf)
+- [Subgaussian random variables: An espository note](https://www.stat.cmu.edu/~arinaldo/36788/subgaussians.pdf)
+- [A note on Sub-Gaussian Random Variables](https://eprint.iacr.org/2019/520.pdf)
+- [Time-uniform central limit theory and asymptotic confidence sequences](https://arxiv.org/pdf/2103.06476.pdf)
+- [Time-uniform, nonparametric, nonasymptotic confidence sequences](https://arxiv.org/pdf/1810.08240.pdf)
+- [On strict sub-Gaussianity, optimal proxy variance and symmetry for bounded random variables](https://arxiv.org/pdf/1901.09188.pdf)
+- [p-Hacking and False Discovery in A/B Testing](https://thearf-org-unified-admin.s3.amazonaws.com/MSI/2020/06/MSI_Report_18-130-1.pdf)
+
+```{r, echo=TRUE, eval=FALSE}
 # FIRST CELL OF CODE
-# Calculate the normal CI (which is asymptotic if the distribution is asymptotically normal, like the maximum likelihood estimator distribution)
-ci_norm <- function(theta_ml, a, se){
-  low <- theta_ml - qnorm(1-(a/2))*se
-  up <- theta_ml + qnorm(1-(a/2))*se
+# Calculate the normal CI (which is asymptotic for non-normal populations)
+ci_norm <- function(mu_est, a, se){
+  low <- mu_est - qnorm(1-(a/2))*se
+  up <- mu_est + qnorm(1-(a/2))*se
   return(c(lower = low, upper = up))
 }
 
 # Calculate the Hoeffding CI
-ci_hoef <- function(){
-  low <- 
-  up <- 
+ci_hoef <- function(mu_est, a, csize){
+  low <- mu_est - sqrt(log(2/a)/(2*csize))
+  up <- mu_est + sqrt(log(2/a)/(2*csize))
+  return(c(lower = low, upper = up))
+}
+
+# Calculate the Chebyshev CI
+ci_cheb <- function(mu_est, a, se, csize){
+  low <- mu_est - se/(sqrt(csize*a))
+  up <- mu_est + se/(sqrt(csize*a))
   return(c(lower = low, upper = up))
 }
 
 # Calculate Sub-Gaussian CS
 cs_subnorm <- function(mu_est, a, csize){
-  low <- mu_est - (1.7*sqrt((log(log(2*csize))+0.72*log(10.4/a))/csize))
-  up <- mu_est + (1.7*sqrt((log(log(2*csize))+0.72*log(10.4/a))/csize))
+  low <- mu_est - (1.7*sqrt((log(log(2*csize))+0.72*log(5.2/a))/csize))
+  up <- mu_est + (1.7*sqrt((log(log(2*csize))+0.72*log(5.2/a))/csize))
   return(c(lower = low, upper = up))
 }
 
-# Calculate Asymptotic Sub-Gaussian CS (which is asymptotic if the distribution is asymptotically normal, like the maximum likelihood estimator distribution)
+# Calculate Asymptotic Sub-Gaussian CS
 cs_asym_subnorm <- function(mu_est, var_est, a, csize){
   low <- mu_est - 1.7*var_est*sqrt((log(log(2*csize))+0.72*log(10.4/a))/csize)
   up <- mu_est + 1.7*var_est*sqrt((log(log(2*csize))+0.72*log(10.4/a))/csize)
@@ -83,80 +110,225 @@ M <- 1000 # arbitrary - simulation size
 t_min <- 100 # arbitrary - minimum sample size
 t_max <- 10000 # arbitrary - maximum sample size
 true_mu <- 0 # arbitrary - true mean
-true_sd <- 2 # arbitrary - true standard deviation
 alpha <- 0.1 # arbitrary - miscoverage probability of ci/cs
 
 # Initialize matrices to store bounds at each time
-# Initialize a vector containing the frequency of miscoverage
-ci_mat_low <-  matrix(NA, nrow = M, ncol = t_max-t_min+1)
-ci_mat_up <- matrix(NA, nrow = M, ncol = t_max-t_min+1)
-ci_mat_miscov <- matrix(0, nrow = M, ncol = t_max-t_min+1)
-cs_mat_low <- matrix(NA, nrow = M, ncol = t_max-t_min+1)
-cs_mat_up <- matrix(NA, nrow = M, ncol = t_max-t_min+1)
-cs_mat_miscov <- matrix(0, nrow = M, ncol = t_max-t_min+1)
+# This is done for both the populations
+ci_n_mat_low_rade <-  matrix(NA, nrow = M, ncol = t_max-t_min+1)
+ci_n_mat_up_rade <- matrix(NA, nrow = M, ncol = t_max-t_min+1)
+ci_h_mat_low_rade <-  matrix(NA, nrow = M, ncol = t_max-t_min+1)
+ci_h_mat_up_rade <- matrix(NA, nrow = M, ncol = t_max-t_min+1)
+ci_c_mat_low_rade <-  matrix(NA, nrow = M, ncol = t_max-t_min+1)
+ci_c_mat_up_rade <- matrix(NA, nrow = M, ncol = t_max-t_min+1)
+cs_mat_low_rade <- matrix(NA, nrow = M, ncol = t_max-t_min+1)
+cs_mat_up_rade <- matrix(NA, nrow = M, ncol = t_max-t_min+1)
+
+ci_n_mat_low_unif <-  matrix(NA, nrow = M, ncol = t_max-t_min+1)
+ci_n_mat_up_unif <- matrix(NA, nrow = M, ncol = t_max-t_min+1)
+ci_h_mat_low_unif <-  matrix(NA, nrow = M, ncol = t_max-t_min+1)
+ci_h_mat_up_unif <- matrix(NA, nrow = M, ncol = t_max-t_min+1)
+ci_c_mat_low_unif <-  matrix(NA, nrow = M, ncol = t_max-t_min+1)
+ci_c_mat_up_unif <- matrix(NA, nrow = M, ncol = t_max-t_min+1)
+cs_mat_low_unif <- matrix(NA, nrow = M, ncol = t_max-t_min+1)
+cs_mat_up_unif <- matrix(NA, nrow = M, ncol = t_max-t_min+1)
+# Set seed for reproducibility
 set.seed(445)
 for (m in 1:M){
-  samp <- c()
+  samp_rade <- c()
+  samp_unif <- c()
   i = 0
   for (t in 1:t_max){
-    samp <- c(samp, rnorm(1, mean = true_mu, sd = true_sd))
+    # RADEMACHER
+    samp_rade <- c(samp_rade, sample(c(-1,1), 1, replace = T))
+    # BERNOULLI
+    #samp <- c(samp, sample(c(0,1), 1, replace = T))
+    # UNIFORM
+    samp_unif <- c(samp_unif, runif(1,-1,1))
+    # NORMAL WITH VARIANCE < 1
+    #samp <- c(samp, rnorm(1, mean = true_mu, sd = true_sd))
     if (t >= t_min){
       i = i+1
-      ci_norm_est <- ci_norm(mean(samp), a = alpha, se = sqrt(var(samp)/t))
-      if(ci_norm_est['lower'] > true_mu | ci_norm_est['upper'] < true_mu){
-        ci_mat_miscov[m,i] <- 1
-      }
-      cs_subnorm_est <- cs_subnorm(mean(samp), a = alpha, csize = t)
-      if(cs_subnorm_est['lower'] > true_mu | cs_subnorm_est['upper'] < true_mu){
-        cs_mat_miscov[m,i] <- 1
-      }
-      ci_mat_low[m,i] <- unname(ci_norm_est['lower'])
-      ci_mat_up[m,i] <- unname(ci_norm_est['upper'])
-      cs_mat_low[m,i] <- unname(cs_subnorm_est['lower'])
-      cs_mat_up[m,i] <- unname(cs_subnorm_est['upper'])
+      
+      # CALCULATE CLT CI
+      ci_norm_est_rade <- ci_norm(mean(samp_rade), a = alpha, se = sqrt(var(samp_rade)/t))
+      ci_norm_est_unif <- ci_norm(mean(samp_unif), a = alpha, se = sqrt(var(samp_unif)/t))
+      
+      # CALCULATE HOEFFDING CI
+      ci_hoef_est_rade <- ci_hoef(mean(samp_rade), a = alpha, csize = t)
+      ci_hoef_est_unif <- ci_hoef(mean(samp_unif), a = alpha, csize = t)
+      
+      # CALCULATE CHEBYSHEV CI
+      ci_cheb_est_rade <- ci_cheb(mean(samp_rade), a = alpha, se = sqrt(var(samp_rade)/t), csize = t)
+      ci_cheb_est_unif <- ci_cheb(mean(samp_unif), a = alpha, se = sqrt(var(samp_unif)/t), csize = t)
+      
+      # CALCULATE CONFIDENCE SEQUENCE
+      cs_subnorm_est_rade <- cs_subnorm(mean(samp_rade), a = alpha, csize = t)
+      cs_subnorm_est_unif <- cs_subnorm(mean(samp_unif), a = alpha, csize = t)
+      
+      # Store results in the matrices
+      ci_n_mat_low_rade[m,i] <- unname(ci_norm_est_rade['lower'])
+      ci_n_mat_up_rade[m,i] <- unname(ci_norm_est_rade['upper'])
+      ci_h_mat_low_rade[m,i] <- unname(ci_hoef_est_rade['lower'])
+      ci_h_mat_up_rade[m,i] <- unname(ci_hoef_est_rade['upper'])
+      ci_c_mat_low_rade[m,i] <- unname(ci_cheb_est_rade['lower'])
+      ci_c_mat_up_rade[m,i] <- unname(ci_cheb_est_rade['upper'])
+      cs_mat_low_rade[m,i] <- unname(cs_subnorm_est_rade['lower'])
+      cs_mat_up_rade[m,i] <- unname(cs_subnorm_est_rade['upper'])
+      ci_n_mat_low_unif[m,i] <- unname(ci_norm_est_unif['lower'])
+      ci_n_mat_up_unif[m,i] <- unname(ci_norm_est_unif['upper'])
+      ci_h_mat_low_unif[m,i] <- unname(ci_hoef_est_unif['lower'])
+      ci_h_mat_up_unif[m,i] <- unname(ci_hoef_est_unif['upper'])
+      ci_c_mat_low_unif[m,i] <- unname(ci_cheb_est_unif['lower'])
+      ci_c_mat_up_unif[m,i] <- unname(ci_cheb_est_unif['upper'])
+      cs_mat_low_unif[m,i] <- unname(cs_subnorm_est_unif['lower'])
+      cs_mat_up_unif[m,i] <- unname(cs_subnorm_est_unif['upper'])
     }
   }
 }
 
-# Estimate miscoverage probability at every t
-ci_miscov <- apply(ci_mat_miscov, MARGIN = 2, FUN = mean)
-cs_miscov <- apply(cs_mat_miscov, MARGIN = 2, FUN = mean)
+# Estimate miscoverage probability at every time 't'
+# At every time it states if the true value of the parameter is inside the interval
+# If it is so, 1 is assigned to it, otherwise 0 is assigned to it
+# After that, the 'cummax' function is used to calculate if there was a miscoverage
+# before each time 't'. The process is repeated for each row (simulation).
+# At the end, a column-wise average is computed to estimate the miscoverage probability
+# at every time 't'
+ci_n_miscov_rade <- colMeans(t(apply(ci_n_mat_low_rade > true_mu | ci_n_mat_up_rade < true_mu, MARGIN = 1, cummax)))
+ci_h_miscov_rade <- colMeans(t(apply(ci_h_mat_low_rade > true_mu | ci_h_mat_up_rade < true_mu, MARGIN = 1, cummax)))
+ci_c_miscov_rade <- colMeans(t(apply(ci_c_mat_low_rade > true_mu | ci_c_mat_up_rade < true_mu, MARGIN = 1, cummax)))
+cs_miscov_rade <- colMeans(t(apply(cs_mat_low_rade > true_mu | cs_mat_up_rade < true_mu, MARGIN = 1, cummax)))
+ci_n_miscov_unif <- colMeans(t(apply(ci_n_mat_low_unif > true_mu | ci_n_mat_up_unif < true_mu, MARGIN = 1, cummax)))
+ci_h_miscov_unif <- colMeans(t(apply(ci_h_mat_low_unif > true_mu | ci_h_mat_up_unif < true_mu, MARGIN = 1, cummax)))
+ci_c_miscov_unif <- colMeans(t(apply(ci_c_mat_low_unif > true_mu | ci_c_mat_up_unif < true_mu, MARGIN = 1, cummax)))
+cs_miscov_unif <- colMeans(t(apply(cs_mat_low_unif > true_mu | cs_mat_up_unif < true_mu, MARGIN = 1, cummax)))
 
-# Size at every t on average
-ci_size <- ci_mat_up - ci_mat_low
-cs_size <- cs_mat_up - cs_mat_low
-ci_avg_size <- apply(ci_size, MARGIN = 2, FUN = mean)
-cs_avg_size <- apply(cs_size, MARGIN = 2, FUN = mean)
+# Calculate the average size at every time 't'
+ci_n_size_rade <- ci_n_mat_up_rade - ci_n_mat_low_rade
+ci_h_size_rade <- ci_h_mat_up_rade - ci_h_mat_low_rade
+ci_c_size_rade <- ci_c_mat_up_rade - ci_c_mat_low_rade
+cs_size_rade <- cs_mat_up_rade - cs_mat_low_rade
+ci_n_size_unif <- ci_n_mat_up_unif - ci_n_mat_low_unif
+ci_h_size_unif <- ci_h_mat_up_unif - ci_h_mat_low_unif
+ci_c_size_unif <- ci_c_mat_up_unif - ci_c_mat_low_unif
+cs_size_unif <- cs_mat_up_unif - cs_mat_low_unif
+ci_n_avg_size_rade <- apply(ci_n_size_rade, MARGIN = 2, FUN = mean)
+ci_h_avg_size_rade <- apply(ci_h_size_rade, MARGIN = 2, FUN = mean)
+ci_c_avg_size_rade <- apply(ci_c_size_rade, MARGIN = 2, FUN = mean)
+cs_avg_size_rade <- apply(cs_size_rade, MARGIN = 2, FUN = mean)
+ci_n_avg_size_unif <- apply(ci_n_size_unif, MARGIN = 2, FUN = mean)
+ci_h_avg_size_unif <- apply(ci_h_size_unif, MARGIN = 2, FUN = mean)
+ci_c_avg_size_unif <- apply(ci_c_size_unif, MARGIN = 2, FUN = mean)
+cs_avg_size_unif <- apply(cs_size_unif, MARGIN = 2, FUN = mean)
 
-# Bounds at every t on average
-ci_avg_lows <- apply(ci_mat_low, MARGIN = 2, FUN = mean)
-ci_avg_ups <- apply(ci_mat_up, MARGIN = 2, FUN = mean)
-cs_avg_lows <- apply(cs_mat_low, MARGIN = 2, FUN = mean)
-cs_avg_ups <- apply(cs_mat_up, MARGIN = 2, FUN = mean)
+# Calculate average bounds at every time 't'
+ci_n_avg_lows_rade <- apply(ci_n_mat_low_rade, MARGIN = 2, FUN = mean)
+ci_n_avg_ups_rade <- apply(ci_n_mat_up_rade, MARGIN = 2, FUN = mean)
+ci_h_avg_lows_rade <- apply(ci_h_mat_low_rade, MARGIN = 2, FUN = mean)
+ci_h_avg_ups_rade <- apply(ci_h_mat_up_rade, MARGIN = 2, FUN = mean)
+ci_c_avg_lows_rade <- apply(ci_c_mat_low_rade, MARGIN = 2, FUN = mean)
+ci_c_avg_ups_rade <- apply(ci_c_mat_up_rade, MARGIN = 2, FUN = mean)
+cs_avg_lows_rade <- apply(cs_mat_low_rade, MARGIN = 2, FUN = mean)
+cs_avg_ups_rade <- apply(cs_mat_up_rade, MARGIN = 2, FUN = mean)
+ci_n_avg_lows_unif <- apply(ci_n_mat_low_unif, MARGIN = 2, FUN = mean)
+ci_n_avg_ups_unif <- apply(ci_n_mat_up_unif, MARGIN = 2, FUN = mean)
+ci_h_avg_lows_unif <- apply(ci_h_mat_low_unif, MARGIN = 2, FUN = mean)
+ci_h_avg_ups_unif <- apply(ci_h_mat_up_unif, MARGIN = 2, FUN = mean)
+ci_c_avg_lows_unif <- apply(ci_c_mat_low_unif, MARGIN = 2, FUN = mean)
+ci_c_avg_ups_unif <- apply(ci_c_mat_up_unif, MARGIN = 2, FUN = mean)
+cs_avg_lows_unif <- apply(cs_mat_low_unif, MARGIN = 2, FUN = mean)
+cs_avg_ups_unif <- apply(cs_mat_up_unif, MARGIN = 2, FUN = mean)
 
+# Export the useful data in a CSV file, because the simulation runtime is really long
+summaries_final <- cbind(ci_n_avg_lows_rade,ci_n_avg_ups_rade,ci_h_avg_lows_rade,ci_h_avg_ups_rade,ci_c_avg_lows_rade,ci_c_avg_ups_rade, cs_avg_lows_rade,cs_avg_ups_rade,ci_n_avg_size_rade,ci_h_avg_size_rade,ci_c_avg_size_rade,cs_avg_size_rade,ci_n_miscov_rade,ci_h_miscov_rade,ci_c_miscov_rade,cs_miscov_rade,ci_n_avg_lows_unif,ci_n_avg_ups_unif,ci_h_avg_lows_unif,ci_h_avg_ups_unif,ci_c_avg_lows_unif,ci_c_avg_ups_unif, cs_avg_lows_unif,cs_avg_ups_unif,ci_n_avg_size_unif,ci_h_avg_size_unif,ci_c_avg_size_unif,cs_avg_size_unif,ci_n_miscov_unif,ci_h_miscov_unif,ci_c_miscov_unif,cs_miscov_unif)
+
+write.csv(summaries_final, file = 'summaries.csv')
 ```
 
-```{r, echo=TRUE}
-print(cs_miscov)
-print(ci_miscov)
+```{r, fig1, echo=FALSE, fig.width=10, fig.height=8, fig.align='center', out.width = '200%', out.height = '400%', dpi = 300}
+# Since the first cell of code is not evaluated (the runtime is too high)
+# the simulation parameters are re-defined here to be used for plots
+M <- 1000 # arbitrary - simulation size
+t_min <- 100 # arbitrary - minimum sample size
+t_max <- 10000 # arbitrary - maximum sample size
+true_mu <- 0 # arbitrary - true mean
+alpha <- 0.1 # arbitrary - miscoverage probability of ci/cs
+
+# Import data obtained from the simulation
+summaries <- read.csv('summaries.csv', header =  T, sep = ',')
+summaries <- summaries[2:ncol(summaries)]
+
+
+par(mfrow = c(2,3))
+
+# Bounds of intervals on average - Rademacher
+# Calculate minimum and maximum ylim
+min_lim <- min(summaries$cs_avg_lows_rade,summaries$ci_n_avg_lows_rade,summaries$ci_h_avg_lows_rade,summaries$ci_c_avg_lows_rade) 
+max_lim <- max(summaries$cs_avg_ups_rade,summaries$ci_n_avg_ups_rade,summaries$ci_h_avg_ups_rade,summaries$ci_c_avg_ups_rade)
+plot(t_min:t_max, summaries$cs_avg_lows_rade, type = 'l', lty = 2, lwd = 1.5, main = 'Intervals bounds on average - Rademacher', ylim = c(min_lim,max_lim), col = 'red', ylab = 'Bound value', xlab = 'Sample size (t)')
+lines(t_min:t_max, summaries$cs_avg_ups_rade, type = 'l', lty = 2, lwd = 1.5,col = 'red')
+lines(t_min:t_max, summaries$ci_n_avg_lows_rade, type = 'l', lty = 2, lwd = 1.5, col = 'darkblue')
+lines(t_min:t_max, summaries$ci_n_avg_ups_rade, type = 'l', lty = 2, lwd = 1.5, col = 'darkblue')
+lines(t_min:t_max, summaries$ci_h_avg_lows_rade, type = 'l', lty = 2, lwd = 1.5, col = 'darkgreen')
+lines(t_min:t_max, summaries$ci_h_avg_ups_rade, type = 'l', lty = 2, lwd = 1.5, col = 'darkgreen')
+lines(t_min:t_max, summaries$ci_c_avg_lows_rade, type = 'l', lty = 2, lwd = 1.5, col = 'darkorange')
+lines(t_min:t_max, summaries$ci_c_avg_ups_rade, type = 'l', lty = 2, lwd = 1.5, col = 'darkorange')
+abline(h = 0, lwd = 1)
+legend('topright', legend = c('True parameter','Conf. Sequence', 'Conf. Interval - CLT','Conf. Interval - Hoeffding', 'Conf. Interval - Chebyshev'), col = c('black','red','darkblue','darkgreen','darkorange'), lty = 1, lwd = 2, cex = 0.8)
+
+# Intervals length on average - Rademacher
+min_lim <- min(summaries$cs_avg_size_rade,summaries$ci_n_avg_size_rade,summaries$ci_h_avg_size_rade,summaries$ci_c_avg_size_rade)
+max_lim <- max(summaries$cs_avg_size_rade,summaries$ci_n_avg_size_rade,summaries$ci_h_avg_size_rade,summaries$ci_c_avg_size_rade)
+plot(t_min:t_max, summaries$cs_avg_size_rade, type = 'l', lwd = 1.5, main = 'Intervals size on average - Rademacher', col = 'red', ylim = c(min_lim,max_lim), ylab = 'Average size', xlab = 'Sample size (t)')
+lines(t_min:t_max, summaries$ci_n_avg_size_rade, type = 'l', lwd = 1.5, col = 'darkblue')
+lines(t_min:t_max, summaries$ci_h_avg_size_rade, type = 'l', lwd = 1.5, col = 'darkgreen')
+lines(t_min:t_max, summaries$ci_c_avg_size_rade, type = 'l', lwd = 1.5, col = 'darkorange')
+legend('topright', legend = c('Conf. Sequence', 'Conf. Interval - CLT','Conf. Interval - Hoeffding', 'Conf. Interval - Chebyshev'), col = c('red','darkblue','darkgreen','darkorange'), lty = 1, lwd = 2, cex = 0.8)
+
+# Cumulative miscoverage probability over t - Rademacher
+min_lim <- min(summaries$cs_miscov_rade,summaries$ci_n_miscov_rade,summaries$ci_h_miscov_rade,summaries$ci_c_miscov_rade)
+max_lim <- max(summaries$cs_miscov_rade,summaries$ci_n_miscov_rade,summaries$ci_h_miscov_rade,summaries$ci_c_miscov_rade)
+plot(t_min:t_max, summaries$cs_miscov_rade, type = 'l', lwd = 1.5, main = 'Cumulative Miscoverage Probability - Rademacher',col = 'red', ylim = c(min_lim,max_lim), ylab = 'Cumulative Miscoverage Probability', xlab = 'Sample size (t)')
+lines(t_min:t_max, summaries$ci_n_miscov_rade, type = 'l', lwd = 1.5, col = 'darkblue')
+lines(t_min:t_max, summaries$ci_h_miscov_rade, type = 'l', lwd = 1.5, col = 'darkgreen')
+lines(t_min:t_max, summaries$ci_c_miscov_rade, type = 'l', lwd = 1.5, col = 'darkorange')
+abline(h = alpha, lwd = 1, lty = 2)
+legend('right', legend = c(expression(paste(alpha, ' level')),'Conf. Sequence', 'Conf. Interval - CLT','Conf. Interval - Hoeffding', 'Conf. Interval - Chebyshev'), col = c('grey','red','darkblue','darkgreen','darkorange'), lty = 1, lwd = 2, cex = 0.8)
+
+# Bounds of intervals on average - Uniform
+min_lim <- min(summaries$cs_avg_lows_unif,summaries$ci_n_avg_lows_unif,summaries$ci_h_avg_lows_unif,summaries$ci_c_avg_lows_unif) 
+max_lim <- max(summaries$cs_avg_ups_unif,summaries$ci_n_avg_ups_unif,summaries$ci_h_avg_ups_unif,summaries$ci_c_avg_ups_unif)
+plot(t_min:t_max, summaries$cs_avg_lows_unif, type = 'l', lty = 2, lwd = 1.5, main = 'Intervals bounds on average - Uniform', ylim = c(min_lim,max_lim), col = 'red',ylab = 'Bound value', xlab = 'Sample size (t)')
+lines(t_min:t_max, summaries$cs_avg_ups_unif, type = 'l', lty = 2, lwd = 1.5, col = 'red')
+lines(t_min:t_max, summaries$ci_n_avg_lows_unif, type = 'l', lty = 2, lwd = 1.5, col = 'darkblue')
+lines(t_min:t_max, summaries$ci_n_avg_ups_unif, type = 'l', lty = 2, lwd = 1.5, col = 'darkblue')
+lines(t_min:t_max, summaries$ci_h_avg_lows_unif, type = 'l', lty = 2, lwd = 1.5, col = 'darkgreen')
+lines(t_min:t_max, summaries$ci_h_avg_ups_unif, type = 'l', lty = 2, lwd = 1.5, col = 'darkgreen')
+lines(t_min:t_max, summaries$ci_c_avg_lows_unif, type = 'l', lty = 2, lwd = 1.5, col = 'darkorange')
+lines(t_min:t_max, summaries$ci_c_avg_ups_unif, type = 'l', lty = 2, lwd = 1.5, col = 'darkorange')
+abline(h = 0, lwd = 1)
+legend('topright', legend = c('True parameter','Conf. Sequence', 'Conf. Interval - CLT','Conf. Interval - Hoeffding', 'Conf. Interval - Chebyshev'), col = c('black','red','darkblue','darkgreen','darkorange'), lty = 1, lwd = 2, cex = 0.8)
+
+# Intervals length on average - Uniform
+min_lim <- min(summaries$cs_avg_size_unif,summaries$ci_n_avg_size_unif,summaries$ci_h_avg_size_unif,summaries$ci_c_avg_size_unif)
+max_lim <- max(summaries$cs_avg_size_unif,summaries$ci_n_avg_size_unif,summaries$ci_h_avg_size_unif,summaries$ci_c_avg_size_unif)
+plot(t_min:t_max, summaries$cs_avg_size_unif, type = 'l', lwd = 1.5, main = 'Intervals size on average - Uniform', col = 'red', ylim = c(min_lim,max_lim), ylab = 'Average size', xlab = 'Sample size (t)')
+lines(t_min:t_max, summaries$ci_n_avg_size_unif, type = 'l', lwd = 1.5, col = 'darkblue')
+lines(t_min:t_max, summaries$ci_h_avg_size_unif, type = 'l', lwd = 1.5, col = 'darkgreen')
+lines(t_min:t_max, summaries$ci_c_avg_size_unif, type = 'l', lwd = 1.5, col = 'darkorange')
+legend('topright', legend = c('Conf. Sequence', 'Conf. Interval - CLT','Conf. Interval - Hoeffding', 'Conf. Interval - Chebyshev'), col = c('red','darkblue','darkgreen','darkorange'), lty = 1, lwd = 2, cex = 0.8)
+
+# Cumulative miscoverage probability over t - Uniform
+min_lim <- min(summaries$cs_miscov_unif,summaries$ci_n_miscov_unif,summaries$ci_h_miscov_unif,summaries$ci_c_miscov_unif)
+max_lim <- max(summaries$cs_miscov_unif,summaries$ci_n_miscov_unif,summaries$ci_h_miscov_unif,summaries$ci_c_miscov_unif)
+plot(t_min:t_max, summaries$cs_miscov_unif, type = 'l', lwd = 1.5, main = 'Cumulative Miscoverage Probability - Uniform',col = 'red', ylim = c(min_lim,max_lim), ylab = 'Cumulative Miscoverage Probability', xlab = 'Sample size (t)')
+lines(t_min:t_max, summaries$ci_n_miscov_unif, type = 'l', lwd = 1.5, col = 'darkblue')
+lines(t_min:t_max, summaries$ci_h_miscov_unif, type = 'l', lwd = 1.5, col = 'darkgreen')
+lines(t_min:t_max, summaries$ci_c_miscov_unif, type = 'l', lwd = 1.5, col = 'darkorange')
+abline(h = alpha, lwd = 1, lty = 2)
+legend(x = 4500, y = 0.66, legend = c(expression(paste(alpha, ' level')),'Conf. Sequence', 'Conf. Interval - CLT','Conf. Interval - Hoeffding', 'Conf. Interval - Chebyshev'), col = c('grey','red','darkblue','darkgreen','darkorange'), lty = 1, lwd = 2, cex = 0.8)
 ```
 
-```{r, echo=FALSE, fig.width=10, fig.height=4, fig.align='center'}
-# FIRST PLOT
-par(mfrow = c(1,3))
+As can be deduces from the plots, in both cases the **Confidence Sequence retains a cumulative miscoverage probability under the target (0.1) at all sample sizes**. The point-wise confidence intervals' cumulative miscoverage probability seems to increase like a logarithm, starting near the target and ending largely over it. An exception is the Chebyshev CI, which retains the worst possible performances even with samples of a modest size.  
+The advantage given by the Confidence Sequence comes with "a cost": the confidence interval, on average, is much larger than the pointwise CIs at every sample size.  
+This design prevents p-hacking during sequential experiments: it is crucial to declare if a treatment has got an effect only when it is so.
 
-# Bounds of intervals on average
-plot(t_min:t_max, cs_avg_lows, type = 'l', main = 'Intervals bounds on average', ylim = c(true_mu-1,true_mu+1), col = 'red')
-lines(t_min:t_max, cs_avg_ups, type = 'l', col = 'red')
-lines(t_min:t_max, ci_avg_lows, type = 'l', col = 'blue')
-lines(t_min:t_max, ci_avg_ups, type = 'l', col = 'blue')
-abline(h = 2, lwd = 1.5)
-
-# Intervals length on average
-plot(t_min:t_max, cs_avg_size, type = 'l', main = 'Intervals size on average', col = 'red')
-lines(t_min:t_max, ci_avg_size, type = 'l', col = 'blue')
-
-# Cumulative miscoverage probability over t
-plot(t_min:t_max, cs_miscov, type = 'l', col = 'red')
-lines(t_min:t_max, ci_miscov, col = 'blue')
-```
