@@ -56,17 +56,7 @@ The target level must be realistic: no one wants an high miscoverage probability
 Since the A/B tests usually involve a high number of people, we've chosen to start the simulation from a sample of size 100, increasing it by one unit at a time until its size becomes 10000.  
 We've decided to evaluate the performance of the intervals by calculating *Cumulative Miscoverage Probability* (how frequently the analyzed intervals do not capture the true mean at different times) and *Running Interval Length* (how large the intervals are, on average, at different times).  
 Since the two chosen populations are 1-Sub-Gaussian, it is not necessary to evaluate the performances of the asymptotic Confidence Sequence.  
-Our choices and explanations are backed by some papers, which you can read at the bottom of this page. Please note that the following cell of code was run only once with a fixed seed and the data was stored in a csv file because the **simulation runtime is high**.
-
-
-### References
-- [Time-uniform Chernoff bounds via nonnegative supermartingales](https://arxiv.org/pdf/1808.03204.pdf)
-- [Subgaussian random variables: An espository note](https://www.stat.cmu.edu/~arinaldo/36788/subgaussians.pdf)
-- [A note on Sub-Gaussian Random Variables](https://eprint.iacr.org/2019/520.pdf)
-- [Time-uniform central limit theory and asymptotic confidence sequences](https://arxiv.org/pdf/2103.06476.pdf)
-- [Time-uniform, nonparametric, nonasymptotic confidence sequences](https://arxiv.org/pdf/1810.08240.pdf)
-- [On strict sub-Gaussianity, optimal proxy variance and symmetry for bounded random variables](https://arxiv.org/pdf/1901.09188.pdf)
-- [p-Hacking and False Discovery in A/B Testing](https://thearf-org-unified-admin.s3.amazonaws.com/MSI/2020/06/MSI_Report_18-130-1.pdf)
+Our choices and explanations are backed by some papers, which you can read at the bottom of this page. Please note that the following cell of code was run only once with a fixed seed and the data was stored in a csv file named *summaries.csv* because the **simulation runtime is high**.
 
 ```{r, echo=TRUE, eval=FALSE}
 # FIRST CELL OF CODE
@@ -331,4 +321,105 @@ legend(x = 4500, y = 0.66, legend = c(expression(paste(alpha, ' level')),'Conf. 
 As can be deduces from the plots, in both cases the **Confidence Sequence retains a cumulative miscoverage probability under the target (0.1) at all sample sizes**. The point-wise confidence intervals' cumulative miscoverage probability seems to increase like a logarithm, starting near the target and ending largely over it. An exception is the Chebyshev CI, which retains the worst possible performances even with samples of a modest size.  
 The advantage given by the Confidence Sequence comes with "a cost": the confidence interval, on average, is much larger than the pointwise CIs at every sample size.  
 This design prevents p-hacking during sequential experiments: it is crucial to declare if a treatment has got an effect only when it is so.
+
+### References
+- [Time-uniform Chernoff bounds via nonnegative supermartingales](https://arxiv.org/pdf/1808.03204.pdf)
+- [Subgaussian random variables: An espository note](https://www.stat.cmu.edu/~arinaldo/36788/subgaussians.pdf)
+- [A note on Sub-Gaussian Random Variables](https://eprint.iacr.org/2019/520.pdf)
+- [Time-uniform central limit theory and asymptotic confidence sequences](https://arxiv.org/pdf/2103.06476.pdf)
+- [Time-uniform, nonparametric, nonasymptotic confidence sequences](https://arxiv.org/pdf/1810.08240.pdf)
+- [On strict sub-Gaussianity, optimal proxy variance and symmetry for bounded random variables](https://arxiv.org/pdf/1901.09188.pdf)
+- [p-Hacking and False Discovery in A/B Testing](https://thearf-org-unified-admin.s3.amazonaws.com/MSI/2020/06/MSI_Report_18-130-1.pdf)
+
+## Exercise 2: Environmental sounds and Mood Experiment
+
+Many researches and papers tell us that the intricate relationship between our sensory experiences and emotional well-being has long been a subject of both scientific inquiry and philosophical speculation. Among the myriad sensory inputs, auditory stimuli (particularly environmental sounds) play a pivotal role in shaping our mood and psychological state.  
+This report delves into a personal experimental investigation aimed at unraveling the impact of two distinct categories of environmental sounds, natural and urban, on the daily mood fluctuations of an individual.Environmental sounds, ranging from the serene chirping of birds and the gentle rustling of leaves to the incessant hum of city traffic and urban bustle, envelop our daily lives.  
+Can the auditory landscape to which we are exposed subtly, yet significantly, influence our emotional equilibrium? Prior research (as can be seen from the references) has indicated that natural sounds often have a soothing effect, promoting relaxation and reducing stress, whereas urban noises can exacerbate anxiety and disrupt mental tranquility. However, the extent and nature of these effects can be profoundly personal and subject to individual variability and this is why we are planning to do this experiment.  
+First of all the question we are trying to answer to, so our **research question**, is the following:  
+
+<div style="border: 2px solid black; background-color: #ffffff; padding:10px; text-align:center; width:70%; margin:0 auto">
+
+**Do ambient sounds heard at the start of the day have an impact on my mood? If they do, is the effect also visible at the end of the day?**  
+
+</div>
+<br>
+The aim of the experiment is answer to the above question, but let’s delve a bit more into the key elements of the experiment.  
+The first important key is the **population** we want to be part of the experiment: since it would be realistically difficult to get a sample such that the results could be generalized, only **one member of our group** (so one of us) will be the person who will undergo the experiment.  
+Another important aspect is the explanation of the **methodology**:  
+
+- The experiment will take a total of **20 days** which will be split up as follows:
+    - During the **first week** the person will **record his/her mood without sounds exposure two times per day**: the first one early in the morning, when he/she will wake up and the second one before going to sleep, so in the evening.
+    - After this first week **6 days** will follow in which the person will wake up in the morning and **listen to a playlist of about 10 minutes with sounds of nature** (taken randomly from a set of sounds including sea waves, birds singing, leaves rustling, breeze).
+    - At this point we have scheduled a break day in which the person undergoing the experiment will be left free before proceeding with the second part of the experiment.
+    - The last part of the experiment will take **6 days** in which the person will wake up in the morning and **listen to a playlist of about 10 minutes with sounds of urban noise** (taken randomly from a set of sounds including traffic, people arguing on the road, man at work).
+Let's clarify a few points:
+    - We’ve chosen to introduce a break of one day so that the sudden change between the two different types of sounds would not have much impact on the data obtained later when listening to the urban sounds: it’s intuitive to think that if the sound of nature had a sort of effect, the mood would collapse drastically if urban sounds are listened the immediately successive day.
+    - The first week will therefore be a *control week* in order to obtain a benchmark to compare with the data collected during the treatment. We’ve thought of taking two different averages: the average of the morning mood and the average of the evening mood (after a full day's experience). This period is one week long in order to have more observations and not just one data point that could be collected as a single question to the experimenter (such as "what is your average mood").
+    - We chose to record the person's mood twice precisely to answer the two research questions and therefore to evaluate both **if the mood changed immediately after listening** therefore when the subject is still under the effect of the acoustic stimulus and both **if the mood had remained constant during the day** and therefore if the effect of the sound had lasted long term during the day.  
+    
+<br>
+<div style="border: 2px solid black; background-color: #ffffff; padding:10px;">
+
+ **EXAMPLE OF EMAIL THE PERSON UNDERGOING THE EXPERIMENT WILL RECEIVE**
+
+**Subject**: Your daily sound experiment instructions  
+  
+Dear [participant's name],  
+Thank you for participating in our sound and mood experiment. Please follow these steps:  
+
+- **Morning**: Immediately after waking up, use your **headphones** to listen to today's sound playlist: [playlist link]. As said before, please use **headphones and close your eyes** in order to achieve a full immersion.  
+- **Mood Tracking**: After listening, fill out [this](https://forms.gle/Nb7bp598TfFbMqYZ7) form. **Repeat the form submission in the evening before going to bed.**  
+
+Your consistent participation is crucial. Feel free to contact us for any questions or issues.  
+Thank you for your involvement!
+
+</div>
+<br>
+The playlists we will send will be the following:  
+<br>
+<div style="border: 2px solid black; background-color: #ffffff; padding:10px;">
+
+| Playlist links for first 6 days | Video links for second 6 days|
+| ------------------------------------ | ------------------------------------ |
+| https://open.spotify.com/playlist/7IzZyqkN4xiy2i12pXAi4b?si=ILYdWxcyRRa1154be21kvw&utm_source=whatsapp | https://www.youtube.com/watch?v=jNqv9j7k7Nw |
+| https://open.spotify.com/playlist/0L36WkuGgCosD8NsfQ8uYT?si=XLjGSLLPR_ad_3_Z2rFIYQ&utm_source=whatsapp | UMORI E RUMORI DELLA CITTÀ DI ROMA |
+| https://open.spotify.com/playlist/0L36WkuGgCosD8NsfQ8uYT?si=XLjGSLLPR_ad_3_Z2rFIYQ&utm_source=whatsapp | https://www.youtube.com/watch?v=48TRWqOfjdM&pp=ygUYc3RhemlvbmUgZGVpIHRyZW5pIHN1b25p |
+| https://open.spotify.com/playlist/0tfhdjZOOoJD6QaFJleJV0?si=dVAaGSeLT1uWIb6cCDhMTw&utm_source=whatsapp | https://www.youtube.com/watch?v=sFF_UaZTksQ&pp=ygUXcnVvbW9yZSBsYXZvcmkgaW4gY29yc28%3D |
+| https://open.spotify.com/playlist/2MMPNzEkFq1RkIXlILQAjt?si=DhINkV7QRiSUPYmmS_TKBw&utm_source=whatsapp | https://www.youtube.com/watch?v=YvXK_MPSY0c&pp=ygUXcnVtb3JlIHRyYWZmaWNvIGNsYWNzb24%3D |
+|https://open.spotify.com/playlist/68yYqyrieFzWGlO8o7MAgQ?si=XVaki44-Re2n5xfbRDworA&utm_source=whatsapp |https://www.youtube.com/watch?v=hxPxQqkUj8Q&pp=ygULY2l0eSBzb3VuZHM%3D |
+
+
+</div>
+<br>
+
+- **Tools and Apps** required for this experiment and **Data Collection**: In order to participate in the experiment, we expect the person to have a smartphone with an internet connection, the Spotify and YouTube apps installed and a pair of headphones for the following reasons:  
+    - During the first week (which we can call *control week*) the person will receive each day an email (sample follows) with a link to a Google form where **he/she will be asked to express his mood with a rating from 1 to 5 where 1 is "sad/frustrated" and 5 is "happy/relaxed". This form must be filled out twice, once in the morning as soon as he/she gets up and once in the evening**. The email is sent at 3 A.M. to be sure that the person can read it as soon as he/she wakes up.
+    - During the successive parts of the experiment he/she will receive at 3 A.M. of each day an email (sample follows) with **a link to a Spotify playlist (if they are the 6 days dedicated to listening to nature) or a link to a YouTube video (in which case they were the days in which the person must listen to urban sounds).** Also in the email he/she will find the link to a google form where **he/she will be asked to express his/her mood with a rating from 1 to 5 where 1 is "sad/frustrated" and 5 is "happy/relaxed". This form will have to be filled out twice, once in the morning as soon as he/she gets up and once in the evening**.
+    - **The sounds must be listened to with headphones in ears and with eyes closed.** This will be expressly specified in the email that the person will receive every day. We’ve chosen to adopt this mode to achieve the most immersive experience possible, as if the person was really in the place where the listened sounds were registered.
+    - **Data Analysis**: after 20 days we will have collected all the useful data, therefore we will have the data collected during the control week and the data collected during the other 12 days in which the person will have listened to the sounds. Now we can formalize what we will do at this point. We will define the two following hypothesis tests:
+        \begin{cases}
+            H_0: \text{the mood of the person didn't change immediately after the listening} \\
+            H_1: \text{the mood of the person changed immediately after the listening}
+        \end{cases}
+        
+        \begin{cases}
+            H_0^\prime: \text{the mood of the person didn't change during the day} \\
+            H_1^\prime: \text{the mood of the person changed during the day}
+        \end{cases}
+<br>
+    So, numerically speaking, we will analyze the data collected from the control week and **estimate the mood distribution** (we already know it will be a discrete distribution but we have to understand what kind of discrete distribution it will be, it could be a Bernoulli or maybe a uniform, we will know only when we have the data) to choose what type of confidence sequence to use.  
+We define $\mu_1$ as the mean of the morning distribution and $\mu_2$ as the mean of the evening distribution. Using the data about the remaining 12 days and **with the help of the confidence sequences** , we will be able to understand whether to reject the null hypothesis or not. In particular, we will reject the null hypothesis if the sample mean is outside the confidence sequence and vice-versa. In the end we will have two confidence sequences:  
+
+        - **One that will give us answers about the first hypothesis test**
+        - **One that will give us answers about the second hypothesis test**
+
+We will thus be able to draw conclusions and answer the two research questions.
+
+### References
+- [The impact of the acoustic environment on human emotion and experience: A case study of worship spaces](https://journals.sagepub.com/doi/10.1177/1351010X211068850)
+- [Anthropogenic Noise Source and Intensity Effects on Mood and Relaxation in Simulated Park Environments](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7591392/)
+- [The association between road traffic noise and depressed mood among different ethnic and socioeconomic groups. The HELIUS study](https://www.sciencedirect.com/science/article/abs/pii/S1438463918304668)
+- [The Influence of Environmental Sounds on Cognition and Mood](https://ir.lib.uwo.ca/cgi/viewcontent.cgi?article=1068&context=psych_uht)
+
 

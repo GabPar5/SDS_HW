@@ -464,26 +464,8 @@ Sequence.<br />
 Our choices and explanations are backed by some papers, which you can
 read at the bottom of this page. Please note that the following cell of
 code was run only once with a fixed seed and the data was stored in a
-csv file because the <strong>simulation runtime is high</strong>.</p>
-<div id="references" class="section level3">
-<h3>References</h3>
-<ul>
-<li><a href="https://arxiv.org/pdf/1808.03204.pdf">Time-uniform Chernoff
-bounds via nonnegative supermartingales</a></li>
-<li><a href="https://www.stat.cmu.edu/~arinaldo/36788/subgaussians.pdf">Subgaussian
-random variables: An espository note</a></li>
-<li><a href="https://eprint.iacr.org/2019/520.pdf">A note on
-Sub-Gaussian Random Variables</a></li>
-<li><a href="https://arxiv.org/pdf/2103.06476.pdf">Time-uniform central
-limit theory and asymptotic confidence sequences</a></li>
-<li><a href="https://arxiv.org/pdf/1810.08240.pdf">Time-uniform,
-nonparametric, nonasymptotic confidence sequences</a></li>
-<li><a href="https://arxiv.org/pdf/1901.09188.pdf">On strict
-sub-Gaussianity, optimal proxy variance and symmetry for bounded random
-variables</a></li>
-<li><a href="https://thearf-org-unified-admin.s3.amazonaws.com/MSI/2020/06/MSI_Report_18-130-1.pdf">p-Hacking
-and False Discovery in A/B Testing</a></li>
-</ul>
+csv file named <em>summaries.csv</em> because the <strong>simulation
+runtime is high</strong>.</p>
 <pre class="r"><code># FIRST CELL OF CODE
 # Calculate the normal CI (which is asymptotic for non-normal populations)
 ci_norm &lt;- function(mu_est, a, se){
@@ -671,6 +653,262 @@ at every sample size.<br />
 This design prevents p-hacking during sequential experiments: it is
 crucial to declare if a treatment has got an effect only when it is
 so.</p>
+<div id="references" class="section level3">
+<h3>References</h3>
+<ul>
+<li><a href="https://arxiv.org/pdf/1808.03204.pdf">Time-uniform Chernoff
+bounds via nonnegative supermartingales</a></li>
+<li><a href="https://www.stat.cmu.edu/~arinaldo/36788/subgaussians.pdf">Subgaussian
+random variables: An espository note</a></li>
+<li><a href="https://eprint.iacr.org/2019/520.pdf">A note on
+Sub-Gaussian Random Variables</a></li>
+<li><a href="https://arxiv.org/pdf/2103.06476.pdf">Time-uniform central
+limit theory and asymptotic confidence sequences</a></li>
+<li><a href="https://arxiv.org/pdf/1810.08240.pdf">Time-uniform,
+nonparametric, nonasymptotic confidence sequences</a></li>
+<li><a href="https://arxiv.org/pdf/1901.09188.pdf">On strict
+sub-Gaussianity, optimal proxy variance and symmetry for bounded random
+variables</a></li>
+<li><a href="https://thearf-org-unified-admin.s3.amazonaws.com/MSI/2020/06/MSI_Report_18-130-1.pdf">p-Hacking
+and False Discovery in A/B Testing</a></li>
+</ul>
+</div>
+</div>
+<div id="exercise-2-environmental-sounds-and-mood-experiment" class="section level2">
+<h2>Exercise 2: Environmental sounds and Mood Experiment</h2>
+<p>Many researches and papers tell us that the intricate relationship
+between our sensory experiences and emotional well-being has long been a
+subject of both scientific inquiry and philosophical speculation. Among
+the myriad sensory inputs, auditory stimuli (particularly environmental
+sounds) play a pivotal role in shaping our mood and psychological
+state.<br />
+This report delves into a personal experimental investigation aimed at
+unraveling the impact of two distinct categories of environmental
+sounds, natural and urban, on the daily mood fluctuations of an
+individual.Environmental sounds, ranging from the serene chirping of
+birds and the gentle rustling of leaves to the incessant hum of city
+traffic and urban bustle, envelop our daily lives.<br />
+Can the auditory landscape to which we are exposed subtly, yet
+significantly, influence our emotional equilibrium? Prior research (as
+can be seen from the references) has indicated that natural sounds often
+have a soothing effect, promoting relaxation and reducing stress,
+whereas urban noises can exacerbate anxiety and disrupt mental
+tranquility. However, the extent and nature of these effects can be
+profoundly personal and subject to individual variability and this is
+why we are planning to do this experiment.<br />
+First of all the question we are trying to answer to, so our
+<strong>research question</strong>, is the following:</p>
+<div style="border: 2px solid black; background-color: #ffffff; padding:10px; text-align:center; width:70%; margin:0 auto">
+<p><strong>Do ambient sounds heard at the start of the day have an
+impact on my mood? If they do, is the effect also visible at the end of
+the day?</strong></p>
+</div>
+<p><br> The aim of the experiment is answer to the above question, but
+let’s delve a bit more into the key elements of the experiment.<br />
+The first important key is the <strong>population</strong> we want to be
+part of the experiment: since it would be realistically difficult to get
+a sample such that the results could be generalized, only <strong>one
+member of our group</strong> (so one of us) will be the person who will
+undergo the experiment.<br />
+Another important aspect is the explanation of the
+<strong>methodology</strong>:</p>
+<ul>
+<li>The experiment will take a total of <strong>20 days</strong> which
+will be split up as follows:
+<ul>
+<li>During the <strong>first week</strong> the person will
+<strong>record his/her mood without sounds exposure two times per
+day</strong>: the first one early in the morning, when he/she will wake
+up and the second one before going to sleep, so in the evening.</li>
+<li>After this first week <strong>6 days</strong> will follow in which
+the person will wake up in the morning and <strong>listen to a playlist
+of about 10 minutes with sounds of nature</strong> (taken randomly from
+a set of sounds including sea waves, birds singing, leaves rustling,
+breeze).</li>
+<li>At this point we have scheduled a break day in which the person
+undergoing the experiment will be left free before proceeding with the
+second part of the experiment.</li>
+<li>The last part of the experiment will take <strong>6 days</strong> in
+which the person will wake up in the morning and <strong>listen to a
+playlist of about 10 minutes with sounds of urban noise</strong> (taken
+randomly from a set of sounds including traffic, people arguing on the
+road, man at work). Let’s clarify a few points:</li>
+<li>We’ve chosen to introduce a break of one day so that the sudden
+change between the two different types of sounds would not have much
+impact on the data obtained later when listening to the urban sounds:
+it’s intuitive to think that if the sound of nature had a sort of
+effect, the mood would collapse drastically if urban sounds are listened
+the immediately successive day.</li>
+<li>The first week will therefore be a <em>control week</em> in order to
+obtain a benchmark to compare with the data collected during the
+treatment. We’ve thought of taking two different averages: the average
+of the morning mood and the average of the evening mood (after a full
+day’s experience). This period is one week long in order to have more
+observations and not just one data point that could be collected as a
+single question to the experimenter (such as “what is your average
+mood”).</li>
+<li>We chose to record the person’s mood twice precisely to answer the
+two research questions and therefore to evaluate both <strong>if the
+mood changed immediately after listening</strong> therefore when the
+subject is still under the effect of the acoustic stimulus and both
+<strong>if the mood had remained constant during the day</strong> and
+therefore if the effect of the sound had lasted long term during the
+day.</li>
+</ul></li>
+</ul>
+<br>
+<div style="border: 2px solid black; background-color: #ffffff; padding:10px;">
+<p><strong>EXAMPLE OF EMAIL THE PERSON UNDERGOING THE EXPERIMENT WILL
+RECEIVE</strong></p>
+<p><strong>Subject</strong>: Your daily sound experiment
+instructions</p>
+<p>Dear [participant’s name],<br />
+Thank you for participating in our sound and mood experiment. Please
+follow these steps:</p>
+<ul>
+<li><strong>Morning</strong>: Immediately after waking up, use your
+<strong>headphones</strong> to listen to today’s sound playlist:
+[playlist link]. As said before, please use <strong>headphones and close
+your eyes</strong> in order to achieve a full immersion.<br />
+</li>
+<li><strong>Mood Tracking</strong>: After listening, fill out <a href="https://forms.gle/Nb7bp598TfFbMqYZ7">this</a> form. <strong>Repeat
+the form submission in the evening before going to bed.</strong></li>
+</ul>
+<p>Your consistent participation is crucial. Feel free to contact us for
+any questions or issues.<br />
+Thank you for your involvement!</p>
+</div>
+<br> The playlists we will send will be the following:<br />
+<br>
+<div style="border: 2px solid black; background-color: #ffffff; padding:10px;">
+<table>
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Playlist links for first 6 days</th>
+<th>Video links for second 6 days</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="https://open.spotify.com/playlist/7IzZyqkN4xiy2i12pXAi4b?si=ILYdWxcyRRa1154be21kvw&amp;utm_source=whatsapp" class="uri">https://open.spotify.com/playlist/7IzZyqkN4xiy2i12pXAi4b?si=ILYdWxcyRRa1154be21kvw&amp;utm_source=whatsapp</a></td>
+<td><a href="https://www.youtube.com/watch?v=jNqv9j7k7Nw" class="uri">https://www.youtube.com/watch?v=jNqv9j7k7Nw</a></td>
+</tr>
+<tr class="even">
+<td><a href="https://open.spotify.com/playlist/0L36WkuGgCosD8NsfQ8uYT?si=XLjGSLLPR_ad_3_Z2rFIYQ&amp;utm_source=whatsapp" class="uri">https://open.spotify.com/playlist/0L36WkuGgCosD8NsfQ8uYT?si=XLjGSLLPR_ad_3_Z2rFIYQ&amp;utm_source=whatsapp</a></td>
+<td>UMORI E RUMORI DELLA CITTÀ DI ROMA</td>
+</tr>
+<tr class="odd">
+<td><a href="https://open.spotify.com/playlist/0L36WkuGgCosD8NsfQ8uYT?si=XLjGSLLPR_ad_3_Z2rFIYQ&amp;utm_source=whatsapp" class="uri">https://open.spotify.com/playlist/0L36WkuGgCosD8NsfQ8uYT?si=XLjGSLLPR_ad_3_Z2rFIYQ&amp;utm_source=whatsapp</a></td>
+<td><a href="https://www.youtube.com/watch?v=48TRWqOfjdM&amp;pp=ygUYc3RhemlvbmUgZGVpIHRyZW5pIHN1b25p" class="uri">https://www.youtube.com/watch?v=48TRWqOfjdM&amp;pp=ygUYc3RhemlvbmUgZGVpIHRyZW5pIHN1b25p</a></td>
+</tr>
+<tr class="even">
+<td><a href="https://open.spotify.com/playlist/0tfhdjZOOoJD6QaFJleJV0?si=dVAaGSeLT1uWIb6cCDhMTw&amp;utm_source=whatsapp" class="uri">https://open.spotify.com/playlist/0tfhdjZOOoJD6QaFJleJV0?si=dVAaGSeLT1uWIb6cCDhMTw&amp;utm_source=whatsapp</a></td>
+<td><a href="https://www.youtube.com/watch?v=sFF_UaZTksQ&amp;pp=ygUXcnVvbW9yZSBsYXZvcmkgaW4gY29yc28%3D" class="uri">https://www.youtube.com/watch?v=sFF_UaZTksQ&amp;pp=ygUXcnVvbW9yZSBsYXZvcmkgaW4gY29yc28%3D</a></td>
+</tr>
+<tr class="odd">
+<td><a href="https://open.spotify.com/playlist/2MMPNzEkFq1RkIXlILQAjt?si=DhINkV7QRiSUPYmmS_TKBw&amp;utm_source=whatsapp" class="uri">https://open.spotify.com/playlist/2MMPNzEkFq1RkIXlILQAjt?si=DhINkV7QRiSUPYmmS_TKBw&amp;utm_source=whatsapp</a></td>
+<td><a href="https://www.youtube.com/watch?v=YvXK_MPSY0c&amp;pp=ygUXcnVtb3JlIHRyYWZmaWNvIGNsYWNzb24%3D" class="uri">https://www.youtube.com/watch?v=YvXK_MPSY0c&amp;pp=ygUXcnVtb3JlIHRyYWZmaWNvIGNsYWNzb24%3D</a></td>
+</tr>
+<tr class="even">
+<td><a href="https://open.spotify.com/playlist/68yYqyrieFzWGlO8o7MAgQ?si=XVaki44-Re2n5xfbRDworA&amp;utm_source=whatsapp" class="uri">https://open.spotify.com/playlist/68yYqyrieFzWGlO8o7MAgQ?si=XVaki44-Re2n5xfbRDworA&amp;utm_source=whatsapp</a></td>
+<td><a href="https://www.youtube.com/watch?v=hxPxQqkUj8Q&amp;pp=ygULY2l0eSBzb3VuZHM%3D" class="uri">https://www.youtube.com/watch?v=hxPxQqkUj8Q&amp;pp=ygULY2l0eSBzb3VuZHM%3D</a></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><br></p>
+<ul>
+<li><strong>Tools and Apps</strong> required for this experiment and
+<strong>Data Collection</strong>: In order to participate in the
+experiment, we expect the person to have a smartphone with an internet
+connection, the Spotify and YouTube apps installed and a pair of
+headphones for the following reasons:
+<ul>
+<li><p>During the first week (which we can call <em>control week</em>)
+the person will receive each day an email (sample follows) with a link
+to a Google form where <strong>he/she will be asked to express his mood
+with a rating from 1 to 5 where 1 is “sad/frustrated” and 5 is
+“happy/relaxed”. This form must be filled out twice, once in the morning
+as soon as he/she gets up and once in the evening</strong>. The email is
+sent at 3 A.M. to be sure that the person can read it as soon as he/she
+wakes up.</p></li>
+<li><p>During the successive parts of the experiment he/she will receive
+at 3 A.M. of each day an email (sample follows) with <strong>a link to a
+Spotify playlist (if they are the 6 days dedicated to listening to
+nature) or a link to a YouTube video (in which case they were the days
+in which the person must listen to urban sounds).</strong> Also in the
+email he/she will find the link to a google form where <strong>he/she
+will be asked to express his/her mood with a rating from 1 to 5 where 1
+is “sad/frustrated” and 5 is “happy/relaxed”. This form will have to be
+filled out twice, once in the morning as soon as he/she gets up and once
+in the evening</strong>.</p></li>
+<li><p><strong>The sounds must be listened to with headphones in ears
+and with eyes closed.</strong> This will be expressly specified in the
+email that the person will receive every day. We’ve chosen to adopt this
+mode to achieve the most immersive experience possible, as if the person
+was really in the place where the listened sounds were
+registered.</p></li>
+<li><p><strong>Data Analysis</strong>: after 20 days we will have
+collected all the useful data, therefore we will have the data collected
+during the control week and the data collected during the other 12 days
+in which the person will have listened to the sounds. Now we can
+formalize what we will do at this point. We will define the two
+following hypothesis tests:</p>
+<span class="math display">\[\begin{cases}
+      H_0: \text{the mood of the person didn&#39;t change immediately
+after the listening} \\
+      H_1: \text{the mood of the person changed immediately after the
+listening}
+  \end{cases}\]</span>
+<span class="math display">\[\begin{cases}
+      H_0^\prime: \text{the mood of the person didn&#39;t change during
+the day} \\
+      H_1^\prime: \text{the mood of the person changed during the day}
+  \end{cases}\]</span>
+<p><br> So, numerically speaking, we will analyze the data collected
+from the control week and <strong>estimate the mood
+distribution</strong> (we already know it will be a discrete
+distribution but we have to understand what kind of discrete
+distribution it will be, it could be a Bernoulli or maybe a uniform, we
+will know only when we have the data) to choose what type of confidence
+sequence to use.<br />
+We define <span class="math inline">\(\mu_1\)</span> as the mean of the
+morning distribution and <span class="math inline">\(\mu_2\)</span> as
+the mean of the evening distribution. Using the data about the remaining
+12 days and <strong>with the help of the confidence sequences</strong> ,
+we will be able to understand whether to reject the null hypothesis or
+not. In particular, we will reject the null hypothesis if the sample
+mean is outside the confidence sequence and vice-versa. In the end we
+will have two confidence sequences:</p>
+<ul>
+<li><strong>One that will give us answers about the first hypothesis
+test</strong></li>
+<li><strong>One that will give us answers about the second hypothesis
+test</strong></li>
+</ul></li>
+</ul></li>
+</ul>
+<p>We will thus be able to draw conclusions and answer the two research
+questions.</p>
+<div id="references-1" class="section level3">
+<h3>References</h3>
+<ul>
+<li><a href="https://journals.sagepub.com/doi/10.1177/1351010X211068850">The
+impact of the acoustic environment on human emotion and experience: A
+case study of worship spaces</a></li>
+<li><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7591392/">Anthropogenic
+Noise Source and Intensity Effects on Mood and Relaxation in Simulated
+Park Environments</a></li>
+<li><a href="https://www.sciencedirect.com/science/article/abs/pii/S1438463918304668">The
+association between road traffic noise and depressed mood among
+different ethnic and socioeconomic groups. The HELIUS study</a></li>
+<li><a href="https://ir.lib.uwo.ca/cgi/viewcontent.cgi?article=1068&amp;context=psych_uht">The
+Influence of Environmental Sounds on Cognition and Mood</a></li>
+</ul>
 </div>
 </div>
 </div>
