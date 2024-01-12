@@ -1,7 +1,7 @@
 ---
 title: "Homework 2 - Group 46"
+author: "Name and Surname: Alessandra Colaiocco - ID: 1843714 - Email: colaiocco.1843714@studenti.uniroma1.it \n\n Name and Surname: Gabriele Parisini - ID: 1964381 - Email: parisini.1964381@studenti.uniroma1.it"
 output: html_document
-date: "2023-12-28"
 ---
 
 ```{r setup, include=FALSE}
