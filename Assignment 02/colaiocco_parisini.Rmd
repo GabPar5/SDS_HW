@@ -263,7 +263,7 @@ lines(t_min:t_max, summaries$ci_h_avg_ups_rade, type = 'l', lty = 2, lwd = 1.5, 
 lines(t_min:t_max, summaries$ci_c_avg_lows_rade, type = 'l', lty = 2, lwd = 1.5, col = 'darkorange')
 lines(t_min:t_max, summaries$ci_c_avg_ups_rade, type = 'l', lty = 2, lwd = 1.5, col = 'darkorange')
 abline(h = 0, lwd = 1)
-legend('topright', legend = c('True parameter','Conf. Sequence', 'Conf. Interval - CLT','Conf. Interval - Hoeffding', 'Conf. Interval - Chebyshev'), col = c('black','red','darkblue','darkgreen','darkorange'), lty = 1, lwd = 2, cex = 0.8)
+legend('topright', legend = c('True parameter','Conf. Sequence', 'Conf. Interval - CLT','Conf. Interval - Hoeffding', 'Conf. Interval - Chebyshev'), col = c('black','red','darkblue','darkgreen','darkorange'), lty = c(1,2,2,2,2), lwd = 2, cex = 0.8, seg.len = 3, bty = 'n')
 
 # Intervals length on average - Rademacher
 min_lim <- min(summaries$cs_avg_size_rade,summaries$ci_n_avg_size_rade,summaries$ci_h_avg_size_rade,summaries$ci_c_avg_size_rade)
@@ -272,7 +272,7 @@ plot(t_min:t_max, summaries$cs_avg_size_rade, type = 'l', lwd = 1.5, main = 'Int
 lines(t_min:t_max, summaries$ci_n_avg_size_rade, type = 'l', lwd = 1.5, col = 'darkblue')
 lines(t_min:t_max, summaries$ci_h_avg_size_rade, type = 'l', lwd = 1.5, col = 'darkgreen')
 lines(t_min:t_max, summaries$ci_c_avg_size_rade, type = 'l', lwd = 1.5, col = 'darkorange')
-legend('topright', legend = c('Conf. Sequence', 'Conf. Interval - CLT','Conf. Interval - Hoeffding', 'Conf. Interval - Chebyshev'), col = c('red','darkblue','darkgreen','darkorange'), lty = 1, lwd = 2, cex = 0.8)
+legend('topright', legend = c('Conf. Sequence', 'Conf. Interval - CLT','Conf. Interval - Hoeffding', 'Conf. Interval - Chebyshev'), col = c('red','darkblue','darkgreen','darkorange'), lty = 1, lwd = 2, cex = 0.8, bty = 'n')
 
 # Cumulative miscoverage probability over t - Rademacher
 min_lim <- min(summaries$cs_miscov_rade,summaries$ci_n_miscov_rade,summaries$ci_h_miscov_rade,summaries$ci_c_miscov_rade)
@@ -281,8 +281,8 @@ plot(t_min:t_max, summaries$cs_miscov_rade, type = 'l', lwd = 1.5, main = 'Cumul
 lines(t_min:t_max, summaries$ci_n_miscov_rade, type = 'l', lwd = 1.5, col = 'darkblue')
 lines(t_min:t_max, summaries$ci_h_miscov_rade, type = 'l', lwd = 1.5, col = 'darkgreen')
 lines(t_min:t_max, summaries$ci_c_miscov_rade, type = 'l', lwd = 1.5, col = 'darkorange')
-abline(h = alpha, lwd = 1, lty = 2)
-legend('right', legend = c(expression(paste(alpha, ' level')),'Conf. Sequence', 'Conf. Interval - CLT','Conf. Interval - Hoeffding', 'Conf. Interval - Chebyshev'), col = c('grey','red','darkblue','darkgreen','darkorange'), lty = 1, lwd = 2, cex = 0.8)
+abline(h = alpha, lwd = 1, lty = 2, col = 'gray30')
+legend('right', legend = c(expression(paste(alpha, ' level')),'Conf. Sequence', 'Conf. Interval - CLT','Conf. Interval - Hoeffding', 'Conf. Interval - Chebyshev'), col = c('gray30','red','darkblue','darkgreen','darkorange'), lty = c(2,1,1,1,1), lwd = 2, cex = 0.8, seg.len = 3, bty = 'n')
 
 # Bounds of intervals on average - Uniform
 min_lim <- min(summaries$cs_avg_lows_unif,summaries$ci_n_avg_lows_unif,summaries$ci_h_avg_lows_unif,summaries$ci_c_avg_lows_unif) 
@@ -296,7 +296,7 @@ lines(t_min:t_max, summaries$ci_h_avg_ups_unif, type = 'l', lty = 2, lwd = 1.5, 
 lines(t_min:t_max, summaries$ci_c_avg_lows_unif, type = 'l', lty = 2, lwd = 1.5, col = 'darkorange')
 lines(t_min:t_max, summaries$ci_c_avg_ups_unif, type = 'l', lty = 2, lwd = 1.5, col = 'darkorange')
 abline(h = 0, lwd = 1)
-legend('topright', legend = c('True parameter','Conf. Sequence', 'Conf. Interval - CLT','Conf. Interval - Hoeffding', 'Conf. Interval - Chebyshev'), col = c('black','red','darkblue','darkgreen','darkorange'), lty = 1, lwd = 2, cex = 0.8)
+legend('topright', legend = c('True parameter','Conf. Sequence', 'Conf. Interval - CLT','Conf. Interval - Hoeffding', 'Conf. Interval - Chebyshev'), col = c('black','red','darkblue','darkgreen','darkorange'), lty = c(1,2,2,2,2), lwd = 2, cex = 0.8, seg.len = 3, bty = 'n')
 
 # Intervals length on average - Uniform
 min_lim <- min(summaries$cs_avg_size_unif,summaries$ci_n_avg_size_unif,summaries$ci_h_avg_size_unif,summaries$ci_c_avg_size_unif)
@@ -305,7 +305,7 @@ plot(t_min:t_max, summaries$cs_avg_size_unif, type = 'l', lwd = 1.5, main = 'Int
 lines(t_min:t_max, summaries$ci_n_avg_size_unif, type = 'l', lwd = 1.5, col = 'darkblue')
 lines(t_min:t_max, summaries$ci_h_avg_size_unif, type = 'l', lwd = 1.5, col = 'darkgreen')
 lines(t_min:t_max, summaries$ci_c_avg_size_unif, type = 'l', lwd = 1.5, col = 'darkorange')
-legend('topright', legend = c('Conf. Sequence', 'Conf. Interval - CLT','Conf. Interval - Hoeffding', 'Conf. Interval - Chebyshev'), col = c('red','darkblue','darkgreen','darkorange'), lty = 1, lwd = 2, cex = 0.8)
+legend('topright', legend = c('Conf. Sequence', 'Conf. Interval - CLT','Conf. Interval - Hoeffding', 'Conf. Interval - Chebyshev'), col = c('red','darkblue','darkgreen','darkorange'), lty = 1, lwd = 2, cex = 0.8, bty = 'n')
 
 # Cumulative miscoverage probability over t - Uniform
 min_lim <- min(summaries$cs_miscov_unif,summaries$ci_n_miscov_unif,summaries$ci_h_miscov_unif,summaries$ci_c_miscov_unif)
@@ -314,8 +314,8 @@ plot(t_min:t_max, summaries$cs_miscov_unif, type = 'l', lwd = 1.5, main = 'Cumul
 lines(t_min:t_max, summaries$ci_n_miscov_unif, type = 'l', lwd = 1.5, col = 'darkblue')
 lines(t_min:t_max, summaries$ci_h_miscov_unif, type = 'l', lwd = 1.5, col = 'darkgreen')
 lines(t_min:t_max, summaries$ci_c_miscov_unif, type = 'l', lwd = 1.5, col = 'darkorange')
-abline(h = alpha, lwd = 1, lty = 2)
-legend(x = 4500, y = 0.66, legend = c(expression(paste(alpha, ' level')),'Conf. Sequence', 'Conf. Interval - CLT','Conf. Interval - Hoeffding', 'Conf. Interval - Chebyshev'), col = c('grey','red','darkblue','darkgreen','darkorange'), lty = 1, lwd = 2, cex = 0.8)
+abline(h = alpha, lwd = 1, lty = 2, col = 'gray30')
+legend(x = 4200, y = 0.66, legend = c(expression(paste(alpha, ' level')),'Conf. Sequence', 'Conf. Interval - CLT','Conf. Interval - Hoeffding', 'Conf. Interval - Chebyshev'), col = c('gray30','red','darkblue','darkgreen','darkorange'), lty = c(2,1,1,1,1), lwd = 2, cex = 0.8, seg.len = 3, bty = 'n')
 ```
 
 As can be deduces from the plots, in both cases the **Confidence Sequence retains a cumulative miscoverage probability under the target (0.1) at all sample sizes**. The point-wise confidence intervals' cumulative miscoverage probability seems to increase like a logarithm, starting near the target and ending largely over it. An exception is the Chebyshev CI, which retains the worst possible performances even with samples of a modest size.  
