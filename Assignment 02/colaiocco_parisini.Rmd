@@ -378,20 +378,63 @@ Thank you for your involvement!
 <br>
 The playlists we will send will be the following:  
 <br>
-<div style="border: 2px solid black; background-color: #ffffff; padding:10px;">
+<style>
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
 
-| Playlist links for first 6 days | Video links for second 6 days|
-| ------------------------------------ | ------------------------------------ |
-| https://open.spotify.com/playlist/7IzZyqkN4xiy2i12pXAi4b?si=ILYdWxcyRRa1154be21kvw&utm_source=whatsapp | https://www.youtube.com/watch?v=jNqv9j7k7Nw |
-| https://open.spotify.com/playlist/0L36WkuGgCosD8NsfQ8uYT?si=XLjGSLLPR_ad_3_Z2rFIYQ&utm_source=whatsapp | UMORI E RUMORI DELLA CITTÀ DI ROMA |
-| https://open.spotify.com/playlist/0L36WkuGgCosD8NsfQ8uYT?si=XLjGSLLPR_ad_3_Z2rFIYQ&utm_source=whatsapp | https://www.youtube.com/watch?v=48TRWqOfjdM&pp=ygUYc3RhemlvbmUgZGVpIHRyZW5pIHN1b25p |
-| https://open.spotify.com/playlist/0tfhdjZOOoJD6QaFJleJV0?si=dVAaGSeLT1uWIb6cCDhMTw&utm_source=whatsapp | https://www.youtube.com/watch?v=sFF_UaZTksQ&pp=ygUXcnVvbW9yZSBsYXZvcmkgaW4gY29yc28%3D |
-| https://open.spotify.com/playlist/2MMPNzEkFq1RkIXlILQAjt?si=DhINkV7QRiSUPYmmS_TKBw&utm_source=whatsapp | https://www.youtube.com/watch?v=YvXK_MPSY0c&pp=ygUXcnVtb3JlIHRyYWZmaWNvIGNsYWNzb24%3D |
-|https://open.spotify.com/playlist/68yYqyrieFzWGlO8o7MAgQ?si=XVaki44-Re2n5xfbRDworA&utm_source=whatsapp |https://www.youtube.com/watch?v=hxPxQqkUj8Q&pp=ygULY2l0eSBzb3VuZHM%3D |
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
 
+th {
+  text-align: center;
+  padding: 8px;
+  border-bottom: 1px solid #F6F6F6; 
+}
 
-</div>
+td {
+  text-align: center;
+  padding: 8px;
+}
+</style>
+
+<table>
+ <thead>
+   <th style="text-align:center; border-bottom: 1px solid black;">Playlist links for first 6 days</th>
+   <th style="text-align:center; border-bottom: 1px solid black;">Video links for second 6 days</th>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:center;"><a href="http://tinyurl.com/483rcrcx">Spotify playlist day 1</a></td>
+   <td style="text-align:center;"><a href="http://tinyurl.com/2p9nszks">YouTube video day 1</a></td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"><a href="http://tinyurl.com/ytxscynj">Spotify playlist day 2</a></td>
+   <td style="text-align:center;"><a href="http://tinyurl.com/3vzk38se">YouTube video day 2</a></td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"><a href="http://tinyurl.com/25n2mbwe">Spotify playlist day 3</a></td>
+   <td style="text-align:center;"><a href="http://tinyurl.com/2fxscxwc">YouTube video day 3</a></td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"><a href="http://tinyurl.com/y4wkzbt5">Spotify playlist day 4</a></td>
+   <td style="text-align:center;"><a href="http://tinyurl.com/549czbup">YouTube video day 4</a></td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"><a href="http://tinyurl.com/4bvxkxkn">Spotify playlist day 5</a></td>
+   <td style="text-align:center;"><a href="http://tinyurl.com/4ks7zbpb">YouTube video day 5</a></td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"><a href="http://tinyurl.com/mr2aezku">Spotify playlist day 6</a></td>
+   <td style="text-align:center;"><a href="http://tinyurl.com/2n5yvkhm">YouTube video day 6</a></td>
+  </tr>
+</tbody>
+</table>
 <br>
+
 
 - **Tools and Apps** required for this experiment and **Data Collection**: In order to participate in the experiment, we expect the person to have a smartphone with an internet connection, the Spotify and YouTube apps installed and a pair of headphones for the following reasons:  
     - During the first week (which we can call *control week*) the person will receive each day an email (sample follows) with a link to a Google form where **he/she will be asked to express his mood with a rating from 1 to 5 where 1 is "sad/frustrated" and 5 is "happy/relaxed". This form must be filled out twice, once in the morning as soon as he/she gets up and once in the evening**. The email is sent at 3 A.M. to be sure that the person can read it as soon as he/she wakes up.
