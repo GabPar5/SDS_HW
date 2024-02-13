@@ -9,4 +9,54 @@ date: "2024-01-27"
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+# Game Theory and Shapley Value
+## Introduction
+A *game* (in *game theory*) is an abstract mathematical model of a scenario in which *agents* (or *players*) interact. When we're dealing with a game, we're interested in those features of the scenario that are relevant to the decisions of the players.  
+In this homework we're focusing on **cooperative games**, which are games populated by a set $\mathcal{P} = \{1,...,p\}$ of players (or *grand coalition*) which are able to form *coalitions* (subsets of the "grand" one).  
+To continue further in the explanation, we would need to define the *characteristic function game*:  
+  
+**Definition 1.**&nbsp;&nbsp;A characteristic function game $G$ is given by a pair $(\mathcal{P},\mathcal{v})$, where $\mathcal{P} = \{1,...,p\}$ is a non-empty set and $\mathcal{v}: 2^{\mathcal{P}}\mapsto\mathbb{R}$ is a **characteristic function** which maps every coalition $C \subseteq\mathcal{P}$ to a real number $\mathcal{v}(C)$ (which is referred to as the **value of the coalition $C$**).  
+  
+It's crucial to understand that the characteristic function game assigns a value to a coalition as a whole, **not telling how the coalition value should be divided among the members of the coalition itself.** How to divide the coalition value is a **fundamental question** in cooperative game theory.  
+Another key problem in game theory is to try to understand what the outcomes of a game will be. An *outcome* of a game $G$ consists of two parts:  
+
+1. A **coalition structure**, which is a partition of the gran coalition into coalitions ($CS = \{C_1,...,C_m\}$)
+2. A **payoff vector** $\mathbb{x} = (x_1,...,x_p)$ associated to the coalition structure which distributes the value $\mathcal{v}(C_j)$ of each coalition among its members. All its entries must be non negative and the sum of entries for players belonging to the same coalition must be lower or equal than the coalition value.
+
+As one can imagine, **not all outcomes are equally desirable**. An outcome that pushes all agents together is (typically) preferable to an outcome that some agents want to deviate from and an outcome that shares the payoff in a fair way is desirable.  
+There are two criteria to evaluate an outcome:
+
+1. **Fairness**: how well each agent's payoff reflects its contribution.
+2. **Stability**: what are the incentives for the agents to stay in the coalition structure.
+
+The **Shapley Value** belongs to a family of solution concepts which takes account mainly of the fairness of an outcome. It's defined with respect to the grand coalition: it defines a way of distributing the value $\mathcal{v}(\mathcal{P})$ that could be obtained by the *gran coalition* (so, in the case where all players are in the same coalition), and it is based on the intuition that **the payment that each agent receives should be proportional to his contribution.**  
+The initial idea is, given a **fixed ordering** of agents, to pay each one of them **according to how much is the increase in the value of the coalition formed by its precedessors**. The problem is that agents that play symmetric roles may receive different payoffs depending on their position in the ordering.  
+The Shapley Value removes the dependence on the agents ordering by **averaging over all possible orderings (or permutations) of the players.**  
+Some additional notation is needed to formally define the Shapley Value:
+
+1. WIP
+2. WIP
+
+Now, we can define the Shapley Value $\psi^G(j)$ (for a game $G$ and a player $j$) as **the average marginal contribution of the player $j$**, where the average is taken **over all permutations** of the player set (assumed to be **all equally likely**):
+
+\begin{align}
+\psi^G(j) = \mathbb{E}_{\pi}\left(\Delta_{\pi}^{G}(j)\right) = \frac{1}{p!} \sum_{\pi \in \Pi_{\mathcal{P}}} \Delta_{\pi}^{G}(j) = \sum_{C : j \notin C} \frac{(\#C)!(p-1-\#C)!}{p!}\left(\mathcal{v}(C\cup\{j\})-\mathcal{v}(C)\right)
+\end{align}
+
+Please note that the marginal contributions $\Delta_{\pi}^{G}(j)$ are of the form $\mathcal{v}(C\cup\{j\})-\mathcal{v}(C)$, where $C$ is a coalition not containing the player $j$. Also, there are $(\#C)!$ possible orderings of $C$ and $(p-1-\#C)!$ possible orderings of $\mathcal{P}\setminus(C\cup\{j\})$.  
+It is shown that the Shapley Value is **the only payoff division scheme** that has all these four properties:
+
+- **Efficiency**: WIP
+- **Dummy player**: WIP
+- **Symmetry**: WIP 
+- **Additivity**: WIP
+
+In **simple games** (monotone and with characteristic function which only takes values 0 and 1), the Shapley Value measures the *power of the player*, the probability that it can influence the outcome of the game. To be more precise, it is the **probability that the player $j$ turns a losing coalition into a winning one.**  
+WIP - BRIEF DESCRIPTION OF SHAPLEY VALUE FOR VARIABLE IMPORTANCE  
+
+## Exercise 1: Get a better understanding of Games and Shapley
+WIP
+
+## Exercise 2: WIP
+
 

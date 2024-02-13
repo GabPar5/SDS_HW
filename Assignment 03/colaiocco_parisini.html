@@ -359,7 +359,117 @@ Surname: Gabriele Parisini - ID: 1964381 - Email: <a href="mailto:parisini.19643
 </div>
 
 
-
+<div id="game-theory-and-shapley-value" class="section level1">
+<h1>Game Theory and Shapley Value</h1>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>A <em>game</em> (in <em>game theory</em>) is an abstract mathematical
+model of a scenario in which <em>agents</em> (or <em>players</em>)
+interact. When we’re dealing with a game, we’re interested in those
+features of the scenario that are relevant to the decisions of the
+players.<br />
+In this homework we’re focusing on <strong>cooperative games</strong>,
+which are games populated by a set <span class="math inline">\(\mathcal{P} = \{1,...,p\}\)</span> of players (or
+<em>grand coalition</em>) which are able to form <em>coalitions</em>
+(subsets of the “grand” one).<br />
+To continue further in the explanation, we would need to define the
+<em>characteristic function game</em>:</p>
+<p><strong>Definition 1.</strong>  A characteristic function game <span class="math inline">\(G\)</span> is given by a pair <span class="math inline">\((\mathcal{P},\mathcal{v})\)</span>, where <span class="math inline">\(\mathcal{P} = \{1,...,p\}\)</span> is a non-empty
+set and <span class="math inline">\(\mathcal{v}:
+2^{\mathcal{P}}\mapsto\mathbb{R}\)</span> is a <strong>characteristic
+function</strong> which maps every coalition <span class="math inline">\(C \subseteq\mathcal{P}\)</span> to a real number
+<span class="math inline">\(\mathcal{v}(C)\)</span> (which is referred
+to as the <strong>value of the coalition <span class="math inline">\(C\)</span></strong>).</p>
+<p>It’s crucial to understand that the characteristic function game
+assigns a value to a coalition as a whole, <strong>not telling how the
+coalition value should be divided among the members of the coalition
+itself.</strong> How to divide the coalition value is a
+<strong>fundamental question</strong> in cooperative game theory.<br />
+Another key problem in game theory is to try to understand what the
+outcomes of a game will be. An <em>outcome</em> of a game <span class="math inline">\(G\)</span> consists of two parts:</p>
+<ol style="list-style-type: decimal">
+<li>A <strong>coalition structure</strong>, which is a partition of the
+gran coalition into coalitions (<span class="math inline">\(CS =
+\{C_1,...,C_m\}\)</span>)</li>
+<li>A <strong>payoff vector</strong> <span class="math inline">\(\mathbb{x} = (x_1,...,x_p)\)</span> associated to
+the coalition structure which distributes the value <span class="math inline">\(\mathcal{v}(C_j)\)</span> of each coalition among
+its members. All its entries must be non negative and the sum of entries
+for players belonging to the same coalition must be lower or equal than
+the coalition value.</li>
+</ol>
+<p>As one can imagine, <strong>not all outcomes are equally
+desirable</strong>. An outcome that pushes all agents together is
+(typically) preferable to an outcome that some agents want to deviate
+from and an outcome that shares the payoff in a fair way is
+desirable.<br />
+There are two criteria to evaluate an outcome:</p>
+<ol style="list-style-type: decimal">
+<li><strong>Fairness</strong>: how well each agent’s payoff reflects its
+contribution.</li>
+<li><strong>Stability</strong>: what are the incentives for the agents
+to stay in the coalition structure.</li>
+</ol>
+<p>The <strong>Shapley Value</strong> belongs to a family of solution
+concepts which takes account mainly of the fairness of an outcome. It’s
+defined with respect to the grand coalition: it defines a way of
+distributing the value <span class="math inline">\(\mathcal{v}(\mathcal{P})\)</span> that could be
+obtained by the <em>gran coalition</em> (so, in the case where all
+players are in the same coalition), and it is based on the intuition
+that <strong>the payment that each agent receives should be proportional
+to his contribution.</strong><br />
+The initial idea is, given a <strong>fixed ordering</strong> of agents,
+to pay each one of them <strong>according to how much is the increase in
+the value of the coalition formed by its precedessors</strong>. The
+problem is that agents that play symmetric roles may receive different
+payoffs depending on their position in the ordering.<br />
+The Shapley Value removes the dependence on the agents ordering by
+<strong>averaging over all possible orderings (or permutations) of the
+players.</strong><br />
+Some additional notation is needed to formally define the Shapley
+Value:</p>
+<ol style="list-style-type: decimal">
+<li>WIP</li>
+<li>WIP</li>
+</ol>
+<p>Now, we can define the Shapley Value <span class="math inline">\(\psi^G(j)\)</span> (for a game <span class="math inline">\(G\)</span> and a player <span class="math inline">\(j\)</span>) as <strong>the average marginal
+contribution of the player <span class="math inline">\(j\)</span></strong>, where the average is taken
+<strong>over all permutations</strong> of the player set (assumed to be
+<strong>all equally likely</strong>):</p>
+<p><span class="math display">\[\begin{align}
+\psi^G(j) = \mathbb{E}_{\pi}\left(\Delta_{\pi}^{G}(j)\right) =
+\frac{1}{p!} \sum_{\pi \in \Pi_{\mathcal{P}}} \Delta_{\pi}^{G}(j) =
+\sum_{C : j \notin C}
+\frac{(\#C)!(p-1-\#C)!}{p!}\left(\mathcal{v}(C\cup\{j\})-\mathcal{v}(C)\right)
+\end{align}\]</span></p>
+<p>Please note that the marginal contributions <span class="math inline">\(\Delta_{\pi}^{G}(j)\)</span> are of the form <span class="math inline">\(\mathcal{v}(C\cup\{j\})-\mathcal{v}(C)\)</span>,
+where <span class="math inline">\(C\)</span> is a coalition not
+containing the player <span class="math inline">\(j\)</span>. Also,
+there are <span class="math inline">\((\#C)!\)</span> possible orderings
+of <span class="math inline">\(C\)</span> and <span class="math inline">\((p-1-\#C)!\)</span> possible orderings of <span class="math inline">\(\mathcal{P}\setminus(C\cup\{j\})\)</span>.<br />
+It is shown that the Shapley Value is <strong>the only payoff division
+scheme</strong> that has all these four properties:</p>
+<ul>
+<li><strong>Efficiency</strong>: WIP</li>
+<li><strong>Dummy player</strong>: WIP</li>
+<li><strong>Symmetry</strong>: WIP</li>
+<li><strong>Additivity</strong>: WIP</li>
+</ul>
+<p>In <strong>simple games</strong> (monotone and with characteristic
+function which only takes values 0 and 1), the Shapley Value measures
+the <em>power of the player</em>, the probability that it can influence
+the outcome of the game. To be more precise, it is the
+<strong>probability that the player <span class="math inline">\(j\)</span> turns a losing coalition into a winning
+one.</strong><br />
+WIP - BRIEF DESCRIPTION OF SHAPLEY VALUE FOR VARIABLE IMPORTANCE</p>
+</div>
+<div id="exercise-1-get-a-better-understanding-of-games-and-shapley" class="section level2">
+<h2>Exercise 1: Get a better understanding of Games and Shapley</h2>
+<p>WIP</p>
+</div>
+<div id="exercise-2-wip" class="section level2">
+<h2>Exercise 2: WIP</h2>
+</div>
+</div>
 
 
 
