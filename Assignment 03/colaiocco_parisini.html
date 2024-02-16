@@ -374,12 +374,12 @@ which are games populated by a set <span class="math inline">\(\mathcal{P} = \{1
 (subsets of the “grand” one).<br />
 To continue further in the explanation, we would need to define the
 <em>characteristic function game</em>:</p>
-<p><strong>Definition 1.</strong>  A characteristic function game <span class="math inline">\(G\)</span> is given by a pair <span class="math inline">\((\mathcal{P},\mathcal{v})\)</span>, where <span class="math inline">\(\mathcal{P} = \{1,...,p\}\)</span> is a non-empty
-set and <span class="math inline">\(\mathcal{v}:
+<p><strong>Definition 1.</strong>  A characteristic function game <span class="math inline">\(G\)</span> is given by a pair <span class="math inline">\((\mathcal{P},\nu)\)</span>, where <span class="math inline">\(\mathcal{P} = \{1,...,p\}\)</span> is a non-empty
+set and <span class="math inline">\(\nu:
 2^{\mathcal{P}}\mapsto\mathbb{R}\)</span> is a <strong>characteristic
 function</strong> which maps every coalition <span class="math inline">\(C \subseteq\mathcal{P}\)</span> to a real number
-<span class="math inline">\(\mathcal{v}(C)\)</span> (which is referred
-to as the <strong>value of the coalition <span class="math inline">\(C\)</span></strong>).</p>
+<span class="math inline">\(\nu(C)\)</span> (which is referred to as the
+<strong>value of the coalition <span class="math inline">\(C\)</span></strong>).</p>
 <p>It’s crucial to understand that the characteristic function game
 assigns a value to a coalition as a whole, <strong>not telling how the
 coalition value should be divided among the members of the coalition
@@ -389,13 +389,13 @@ Another key problem in game theory is to try to understand what the
 outcomes of a game will be. An <em>outcome</em> of a game <span class="math inline">\(G\)</span> consists of two parts:</p>
 <ol style="list-style-type: decimal">
 <li>A <strong>coalition structure</strong>, which is a partition of the
-gran coalition into coalitions (<span class="math inline">\(CS =
-\{C_1,...,C_m\}\)</span>)</li>
+gran coalition into coalitions <span class="math inline">\(\big(CS =
+\{C_1,...,C_m\}\big)\)</span></li>
 <li>A <strong>payoff vector</strong> <span class="math inline">\(\mathbb{x} = (x_1,...,x_p)\)</span> associated to
-the coalition structure which distributes the value <span class="math inline">\(\mathcal{v}(C_j)\)</span> of each coalition among
-its members. All its entries must be non negative and the sum of entries
-for players belonging to the same coalition must be lower or equal than
-the coalition value.</li>
+the coalition structure which distributes the value <span class="math inline">\(\nu(C_j)\)</span> of each coalition among its
+members. All its entries must be non negative and the sum of entries for
+players belonging to the same coalition must be lower or equal than the
+coalition value.</li>
 </ol>
 <p>As one can imagine, <strong>not all outcomes are equally
 desirable</strong>. An outcome that pushes all agents together is
@@ -409,14 +409,14 @@ contribution.</li>
 <li><strong>Stability</strong>: what are the incentives for the agents
 to stay in the coalition structure.</li>
 </ol>
-<p>The <strong>Shapley Value</strong> belongs to a family of solution
-concepts which takes account mainly of the fairness of an outcome. It’s
-defined with respect to the grand coalition: it defines a way of
-distributing the value <span class="math inline">\(\mathcal{v}(\mathcal{P})\)</span> that could be
-obtained by the <em>gran coalition</em> (so, in the case where all
-players are in the same coalition), and it is based on the intuition
-that <strong>the payment that each agent receives should be proportional
-to his contribution.</strong><br />
+<p>We’ll focus on the <strong>Shapley Value</strong> that belongs to a
+family of solution concepts which takes account mainly of the fairness
+of an outcome. It’s defined with respect to the grand coalition: it
+defines a way of distributing the value <span class="math inline">\(\nu(\mathcal{P})\)</span> that could be obtained
+by the <em>gran coalition</em> (so, in the case where all players are in
+the same coalition), and it is based on the intuition that <strong>the
+payment that each agent receives should be proportional to his
+contribution.</strong><br />
 The initial idea is, given a <strong>fixed ordering</strong> of agents,
 to pay each one of them <strong>according to how much is the increase in
 the value of the coalition formed by its precedessors</strong>. The
@@ -428,10 +428,18 @@ players.</strong><br />
 Some additional notation is needed to formally define the Shapley
 Value:</p>
 <ol style="list-style-type: decimal">
-<li>WIP</li>
-<li>WIP</li>
+<li><span class="math inline">\(S_\pi(j)\)</span> the set of all
+predecessors of player <span class="math inline">\(j\)</span> in <span class="math inline">\(\pi\)</span> defined as <span class="math inline">\(S_\pi(j)= \{r \in \mathcal{P} \ \text{such tath} \
+\pi(r) &lt; \pi(j)\}\)</span> where <span class="math inline">\(\Pi_{\mathcal{P}}\)</span> is the set of all
+permutations of <span class="math inline">\(\mathcal{P}\)</span> and
+<span class="math inline">\(\pi\)</span> is a specific
+permutation.<br />
+</li>
+<li><strong>The marginal contribution</strong> of an agent <span class="math inline">\(j\)</span> with respect to a permutation <span class="math inline">\(\pi\)</span> in a game <span class="math inline">\(G = (\mathcal{P}, \nu)\)</span>, that is <span class="math display">\[\Delta_\pi^G(j) = \nu(S_\pi(j) \cup \{j\} ) -
+\nu(S_\pi(j))\]</span> and measures how much player <span class="math inline">\(j\)</span> increases the value of the coalition
+consisting of its predecessor in <span class="math inline">\(\pi\)</span>.</li>
 </ol>
-<p>Now, we can define the Shapley Value <span class="math inline">\(\psi^G(j)\)</span> (for a game <span class="math inline">\(G\)</span> and a player <span class="math inline">\(j\)</span>) as <strong>the average marginal
+<p>Now, we can define the <strong>Shapley Value</strong> <span class="math inline">\(\psi^G(j)\)</span> (for a game <span class="math inline">\(G\)</span> and a player <span class="math inline">\(j\)</span>) as <strong>the average marginal
 contribution of the player <span class="math inline">\(j\)</span></strong>, where the average is taken
 <strong>over all permutations</strong> of the player set (assumed to be
 <strong>all equally likely</strong>):</p>
@@ -439,32 +447,240 @@ contribution of the player <span class="math inline">\(j\)</span></strong>, wher
 \psi^G(j) = \mathbb{E}_{\pi}\left(\Delta_{\pi}^{G}(j)\right) =
 \frac{1}{p!} \sum_{\pi \in \Pi_{\mathcal{P}}} \Delta_{\pi}^{G}(j) =
 \sum_{C : j \notin C}
-\frac{(\#C)!(p-1-\#C)!}{p!}\left(\mathcal{v}(C\cup\{j\})-\mathcal{v}(C)\right)
+\frac{(\#C)!(p-1-\#C)!}{p!}\left(\nu(C\cup\{j\})-\nu(C)\right)
 \end{align}\]</span></p>
-<p>Please note that the marginal contributions <span class="math inline">\(\Delta_{\pi}^{G}(j)\)</span> are of the form <span class="math inline">\(\mathcal{v}(C\cup\{j\})-\mathcal{v}(C)\)</span>,
-where <span class="math inline">\(C\)</span> is a coalition not
-containing the player <span class="math inline">\(j\)</span>. Also,
-there are <span class="math inline">\((\#C)!\)</span> possible orderings
-of <span class="math inline">\(C\)</span> and <span class="math inline">\((p-1-\#C)!\)</span> possible orderings of <span class="math inline">\(\mathcal{P}\setminus(C\cup\{j\})\)</span>.<br />
+<p>Please note that the marginal contributions <span class="math inline">\(\Delta_{\pi}^{G}(j)\)</span> are of the form <span class="math inline">\(\nu(C\cup\{j\})-\nu(C)\)</span>, where <span class="math inline">\(C\)</span> is a coalition not containing the
+player <span class="math inline">\(j\)</span>. Also, there are <span class="math inline">\((\#C)!\)</span> possible orderings of <span class="math inline">\(C\)</span> and <span class="math inline">\((p-1-\#C)!\)</span> possible orderings of <span class="math inline">\(\mathcal{P}\setminus(C\cup\{j\})\)</span>.<br />
 It is shown that the Shapley Value is <strong>the only payoff division
 scheme</strong> that has all these four properties:</p>
 <ul>
-<li><strong>Efficiency</strong>: WIP</li>
-<li><strong>Dummy player</strong>: WIP</li>
-<li><strong>Symmetry</strong>: WIP</li>
-<li><strong>Additivity</strong>: WIP</li>
+<li><strong>Efficiency</strong>: <span class="math inline">\(\sum_{j}
+\psi^G(j) = \nu(\mathcal{P})\)</span>.</li>
+<li><strong>Dummy player</strong>: if player <span class="math inline">\(j\)</span> is dummy (i.e., <span class="math inline">\(\nu(C \cup \{j\}) = \nu(C)\)</span> for any
+coalition <span class="math inline">\(C\)</span>), then <span class="math inline">\(\psi^G(j) = 0\)</span>.</li>
+<li><strong>Symmetry</strong>: if <span class="math inline">\(j_1\)</span> and <span class="math inline">\(j_2\)</span> are symmetric players (i.e., <span class="math inline">\(\nu(C \cup \{j_1\}) = \nu(C \cup \{j_2\})\)</span>
+for any coalition <span class="math inline">\(C\)</span>), then <span class="math inline">\(\psi^{G}(j_1) = \psi^{G}(j_2)\)</span>.<br />
+</li>
+<li><strong>Additivity</strong>: given any two characteristic function
+games <span class="math inline">\(G_1 = (\mathcal{P},\nu_1)\)</span> and
+<span class="math inline">\(G_2 = (\mathcal{P},\nu_2)\)</span>, and
+their sum <span class="math inline">\(G^+ = (\mathcal{P},\nu_1 +
+\nu_2)\)</span>, <span class="math display">\[\psi^+(j) = \psi^G_1(j) +
+\psi^G_2(j) \text{ for all } j \in \mathcal{P}.\]</span></li>
 </ul>
 <p>In <strong>simple games</strong> (monotone and with characteristic
 function which only takes values 0 and 1), the Shapley Value measures
 the <em>power of the player</em>, the probability that it can influence
 the outcome of the game. To be more precise, it is the
 <strong>probability that the player <span class="math inline">\(j\)</span> turns a losing coalition into a winning
-one.</strong><br />
-WIP - BRIEF DESCRIPTION OF SHAPLEY VALUE FOR VARIABLE IMPORTANCE</p>
+one.</strong></p>
+<p>The last important concept to stress is that the <strong>Shaley
+value</strong> can be used to determine the importance of different
+variables (<strong>covariates</strong>) in a supervised learning
+problem. It casts the problem as a game where the <strong>covariates are
+players</strong> and the <strong>measure of fit is the characteristic
+function.</strong> <strong>The value of a coalition of covariates is the
+negative expected squared difference between the actual and predicted
+outcomes.</strong> The Shapley value represents the <strong>average
+contribution of a covariate to the predictive accuracy across all
+possible combinations of covariates.</strong></p>
+<p>An important remark regarding the Shapley value is that while it
+offer a comprehensive importance measure, <strong>it isn’t without
+limitations</strong>, such as being affected by covariate
+correlation.</p>
 </div>
 <div id="exercise-1-get-a-better-understanding-of-games-and-shapley" class="section level2">
 <h2>Exercise 1: Get a better understanding of Games and Shapley</h2>
-<p>WIP</p>
+<p>In this first exercise, given a game with 3 player,
+<strong>Antwohnette (A), BadellPadel (B) and Chumbawamba (C)</strong> we
+are asked to complete the definition of the <strong>characteristic
+function game, <span class="math inline">\(\nu\)</span></strong>, and
+then to calculate the <strong>Shapley value</strong>.</p>
+<p>Taking into account the definition of the <strong>characteristic
+function game <span class="math inline">\(\nu\)</span></strong> above we
+can claim that:</p>
+<ul>
+<li><span class="math inline">\(\mathcal{P}=\{A,B,C\}\)</span> is the
+set of our agents (our players).<br />
+</li>
+<li><span class="math inline">\(\nu: 2^\mathcal{P} \rightarrow
+\mathbb{R}\)</span> is our <strong>characteristic function</strong> that
+we have to find.</li>
+</ul>
+<p>From the text of the exercise we know that:</p>
+<ul>
+<li><span class="math inline">\(\nu(A)=\nu(B)=\nu(C)=0\)</span><br />
+</li>
+<li><span class="math inline">\(\nu(ABC)=4\)</span></li>
+</ul>
+<p>Now we have to find the other value of <span class="math inline">\(\nu\)</span> associated with the others
+combinations of our players and so we have to find <span class="math inline">\(\nu(AB)\)</span>, <span class="math inline">\(\nu(AC)\)</span> and <span class="math inline">\(\nu(BC)\)</span>.<br />
+Let’s start with the definition of our <span class="math inline">\(\nu(C)\)</span> that is <strong>the numbers of
+hours potentially saved by well organized coalition</strong>, so in
+order to get our values we have to find the hours in which each pair of
+players saves time by working together and thus we must numerically
+count the hours in which our players are dedicated to solving the
+homework at the same time. From the setup of the game we know that:</p>
+<ul>
+<li><strong>Player A works from 14:00 to 17:00</strong><br />
+</li>
+<li><strong>Player B works from 11:00 to 16:00</strong><br />
+</li>
+<li><strong>Player C works from 9:00 to 13:00</strong></li>
+</ul>
+<p>An so we can claim that:</p>
+<ul>
+<li><span class="math inline">\(\nu(AB)=2\)</span>, because the hours in
+which both A and B are dedicated to solving the homework are exactly 2,
+from 14:00 to 16:00.<br />
+</li>
+<li><span class="math inline">\(\nu(AC)=0\)</span>, because Because A
+and C never have hours in common to work together on the homework and
+thus ‘team up’.<br />
+</li>
+<li><span class="math inline">\(\nu(BC)=2\)</span>, because the hours in
+which both A and B are dedicated to solving the homework are exactly 2,
+from 11:00 to 13:00.</li>
+</ul>
+<p>We have thus completed the definition of <span class="math inline">\(\nu\)</span> and we can proceed to calculate the
+<strong>Shaplay value</strong>. We have <span class="math inline">\(\mathcal{P}=\{A,B,C\}\)</span> so the number of
+the permutation of a set of 3 elements is <span class="math inline">\(3!=6\)</span>.<br />
+Due to this we have to analyze <span class="math inline">\(6\)</span>
+permutations, let’s denote <span class="math inline">\(\Pi_\mathcal{P}\)</span> the set of all
+permutations of <span class="math inline">\(\mathcal{P}\)</span>, with
+this notation we have to focus on: <span class="math display">\[\Pi_\mathcal{P}=\{(A,B,C), (A,C,B), (B,A,C),
+(B,C,A), (C,A,B), (C,B,A)\}\]</span> In order to get, <span class="math inline">\(\Delta_\pi^G(j) = \nu(S_\pi(j) \cup \{j\} ) -
+\nu(S_\pi(j))\)</span>, that is the <strong>marginal
+contribution</strong> of each player calculated recurring to, <span class="math inline">\(S_\pi(j)\)</span>, the set of all predecessors of
+player <span class="math inline">\(j\)</span>, where <span class="math inline">\(j \in \{A,B,C\}\)</span>, in each permutation,
+<span class="math inline">\(\pi\)</span>, we have to analyze each
+permutation at time:</p>
+<ul>
+<li><span class="math inline">\((A,B,C):\)</span>
+<ul>
+<li><span class="math inline">\(\Delta_\pi^G(A) = \nu(S_\pi(A) \cup
+\{A\} ) - \nu(S_\pi(A))= \nu(\emptyset \cup \{A\} ) - \nu(\emptyset) =
+\nu(A) - \nu(\emptyset)=0\)</span><br />
+</li>
+<li><span class="math inline">\(\Delta_\pi^G(B) = \nu(S_\pi(B) \cup
+\{B\} ) - \nu(S_\pi(B))=\nu(\{A\} \cup \{B\} ) - \nu(A) = \nu(AB) -
+\nu(A)=2-0=2\)</span><br />
+</li>
+<li><span class="math inline">\(\Delta_\pi^G(C) = \nu(S_\pi(C) \cup
+\{C\} ) - \nu(S_\pi(C))= \nu(\{A,B\} \cup \{C\} ) - \nu(AB) = \nu(ABC) -
+\nu(AB)=4-2=2\)</span><br />
+</li>
+</ul></li>
+<li><span class="math inline">\((A,C,B):\)</span>
+<ul>
+<li><span class="math inline">\(\Delta_\pi^G(A) = 0.\)</span><br />
+Because the calculation here is the same of the the previous step
+because the <span class="math inline">\(A\)</span> is in the same
+position in the permutation so its <strong>marginal
+contribution</strong> is the same.</li>
+<li><span class="math inline">\(\Delta_\pi^G(C) = \nu(S_\pi(C) \cup
+\{C\} ) - \nu(S_\pi(C))= \nu(\{A\} \cup \{C\} ) - \nu(A) = \nu(AC) -
+\nu(A)=0-0=0\)</span><br />
+</li>
+<li><span class="math inline">\(\Delta_\pi^G(B) = 4\)</span><br />
+We can claim this because <span class="math inline">\(\sum_{j\in
+\pi}\Delta_\pi^G(j)=\nu(A,B,C)=4\)</span> so since we know that <span class="math inline">\(\Delta_\pi^G(A) = 4\)</span> and <span class="math inline">\(\Delta_\pi^G(C) =0\)</span> definitely <span class="math inline">\(\Delta_\pi^G(B) = 4.\)</span><br />
+</li>
+</ul></li>
+<li><span class="math inline">\((B,A,C):\)</span>
+<ul>
+<li><span class="math inline">\(\Delta_\pi^G(B) = \nu(S_\pi(B) \cup
+\{B\} ) - \nu(S_\pi(B))=\nu(\emptyset \cup \{B\} ) - \nu(\emptyset) =
+\nu(B) - \nu(\emptyset)=0-0=0\)</span><br />
+</li>
+<li><span class="math inline">\(\Delta_\pi^G(A) = \nu(S_\pi(A) \cup
+\{A\} ) - \nu(S_\pi(A))=\nu(\{B\} \cup \{A\} ) - \nu(B)= \nu(AB) -
+\nu(B)=2-0=2\)</span><br />
+</li>
+<li><span class="math inline">\(\Delta_\pi^G(C) = 2\)</span><br />
+The reason behind this result is the same of the previous step <span class="math inline">\(\big(\sum_{j\in
+\pi}\Delta_\pi^G(j)=\nu(A,B,C)=4\big).\)</span><br />
+</li>
+</ul></li>
+<li><span class="math inline">\((B,C,A):\)</span>
+<ul>
+<li><span class="math inline">\(\Delta_\pi^G(B) = 0\)</span><br />
+Because the calculation here is the same of the the previous step
+because the <span class="math inline">\(B\)</span> is in the same
+position in the permutation so its <strong>marginal
+contribution</strong> is the same.</li>
+<li><span class="math inline">\(\Delta_\pi^G(C) = \nu(S_\pi(C) \cup
+\{C\} ) - \nu(S_\pi(C)) = \nu(\{B\} \cup \{C\} ) - \nu(B)=\nu(BC) -
+\nu(B) = 2-0=2\)</span><br />
+</li>
+<li><span class="math inline">\(\Delta_\pi^G(A) = 2\)</span><br />
+Due to the fact that <span class="math inline">\(\sum_{j\in
+\pi}\Delta_\pi^G(j)=\nu(A,B,C)=4\)</span> we have this result.<br />
+</li>
+</ul></li>
+<li><span class="math inline">\((C,A,B):\)</span>
+<ul>
+<li><span class="math inline">\(\Delta_\pi^G(C) = \nu(S_\pi(C) \cup
+\{C\} ) - \nu(S_\pi(C))=\nu(\emptyset \cup \{C\} ) - \nu(\emptyset) =
+\nu(C) - \nu(\emptyset)=0-0=0\)</span></li>
+<li><span class="math inline">\(\Delta_\pi^G(A) = \nu(S_\pi(A) \cup
+\{A\} ) - \nu(S_\pi(A))=\nu(\{C\} \cup \{A\} ) - \nu(C) = \nu(AC) -
+\nu(C)=0-0=0\)</span></li>
+<li><span class="math inline">\(\Delta_\pi^G(B) = 4\)</span><br />
+Here again the result it is this due to the fact that <span class="math inline">\(\sum_{j\in
+\pi}\Delta_\pi^G(j)=\nu(A,B,C)=4.\)</span></li>
+</ul></li>
+<li><span class="math inline">\((C,B,A):\)</span>
+<ul>
+<li><span class="math inline">\(\Delta_\pi^G(C) = 0\)</span><br />
+Because the calculation here is the same of the the previous step
+because the <span class="math inline">\(B\)</span> is in the same
+position in the permutation so its <strong>marginal
+contribution</strong> is the same.</li>
+<li><span class="math inline">\(\Delta_\pi^G(B) = \nu(S_\pi(B) \cup
+\{B\} ) - \nu(S_\pi(B))=\nu(\{C\} \cup \{B\} ) - \nu(C) = \nu(BC) -
+\nu(C)=2-0=2\)</span></li>
+<li><span class="math inline">\(\Delta_\pi^G(A) = 2\)</span><br />
+Here again the result it is this due to the fact that <span class="math inline">\(\sum_{j\in
+\pi}\Delta_\pi^G(j)=\nu(A,B,C)=4.\)</span></li>
+</ul></li>
+</ul>
+<p>So to summarize all the calculations in a table we have:</p>
+<p><span class="math display">\[
+\begin{array}{c|ccc}
+\text{Permutation} &amp; \text{Player A} &amp; \text{Player B} &amp;
+\text{Player C} \\ \hline
+ABC &amp; 0 &amp; 2 &amp; 2 \\
+ACB &amp; 0 &amp; 4 &amp; 0 \\
+BAC &amp; 2 &amp; 0 &amp; 2 \\
+BCA &amp; 2 &amp; 0 &amp; 2 \\
+CAB &amp; 0 &amp; 4 &amp; 0 \\
+CBA &amp; 2 &amp; 2 &amp; 0 \\ \hline
+\text{TOTAL VALUE} &amp; 6 &amp; 12 &amp; 6 \\
+\end{array}
+\]</span></p>
+<p>At this point, we have everything to calculate the <strong>Shapley
+value</strong>. First of all, remember that the <strong>Shapley
+value</strong> of each player <span class="math inline">\(j\)</span>,
+where <span class="math inline">\(j \in \{A,B,C\}\)</span> is the
+function that calculates the average marginal contribution of each
+players, taken over all permutations of the player-set, in particular we
+have: <span class="math display">\[\psi^G(j)=\mathbb{E}[\Delta_\pi^G(j)]=\frac{1}{p!}\sum_{\pi
+\in \Pi_\mathcal{P}} \Delta_\pi^G(j)\]</span> In our scenario we have
+<span class="math inline">\(3!=6\)</span> permutations and for each
+player we have:<br />
+- <strong>Player A:</strong> <span class="math inline">\(\sum_{\pi \in
+\Pi_\mathcal{P}} \Delta_\pi^G(A)=6\)</span><br />
+- <strong>Player B:</strong> <span class="math inline">\(\sum_{\pi \in
+\Pi_\mathcal{P}} \Delta_\pi^G(B)=12\)</span><br />
+- <strong>Player C:</strong> <span class="math inline">\(\sum_{\pi \in
+\Pi_\mathcal{P}} \Delta_\pi^G(C)=6\)</span><br />
+So in the end we can claim that:<br />
+<span class="math display">\[\psi^G(A)=\frac{6}{6}=1 \\
+\psi^G(B)=\frac{12}{6}=2 \\ \psi^G(C)=\frac{6}{6}=1\]</span> <strong>If
+we read this value in the context of the exercise they suggest to us
+that Antwohnette and Chumbawamba have potentially saved 1 hour by well
+organized coalition, instead BadellPadel 2 hours.</strong></p>
 </div>
 <div id="exercise-2-wip" class="section level2">
 <h2>Exercise 2: WIP</h2>
@@ -556,6 +772,7 @@ Financials. Due per settore</p>
 <pre class="r"><code># PREPROCESSING PART 1
 # Get stocks data with the library &#39;tseries&#39;
 library(tseries, quietly = T)</code></pre>
+<pre><code>## Warning: il pacchetto &#39;tseries&#39; è stato creato con R versione 4.3.2</code></pre>
 <pre><code>## Registered S3 method overwritten by &#39;quantmod&#39;:
 ##   method            from
 ##   as.zoo.data.frame zoo</code></pre>
@@ -802,6 +1019,9 @@ knitr::kable(corr_mat ,  caption = &quot;Correlation Matrix&quot;)</code></pre>
 </tr>
 </tbody>
 </table>
+<p>WIP - SEARCH HOW TO GET NORMAL CI FOR PEARSON’S CORRELATION IN R,
+SELECT A THRESHOLD AND BUILD THE GRAPH WIP - PLOT THE GRAPH WITH IGRAPHR
+AND COMMENT</p>
 </div>
 </div>
 

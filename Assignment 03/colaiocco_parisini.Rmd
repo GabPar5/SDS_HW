@@ -15,13 +15,13 @@ A *game* (in *game theory*) is an abstract mathematical model of a scenario in w
 In this homework we're focusing on **cooperative games**, which are games populated by a set $\mathcal{P} = \{1,...,p\}$ of players (or *grand coalition*) which are able to form *coalitions* (subsets of the "grand" one).  
 To continue further in the explanation, we would need to define the *characteristic function game*:  
   
-**Definition 1.**&nbsp;&nbsp;A characteristic function game $G$ is given by a pair $(\mathcal{P},\mathcal{v})$, where $\mathcal{P} = \{1,...,p\}$ is a non-empty set and $\mathcal{v}: 2^{\mathcal{P}}\mapsto\mathbb{R}$ is a **characteristic function** which maps every coalition $C \subseteq\mathcal{P}$ to a real number $\mathcal{v}(C)$ (which is referred to as the **value of the coalition $C$**).  
+**Definition 1.**&nbsp;&nbsp;A characteristic function game $G$ is given by a pair $(\mathcal{P},\nu)$, where $\mathcal{P} = \{1,...,p\}$ is a non-empty set and $\nu: 2^{\mathcal{P}}\mapsto\mathbb{R}$ is a **characteristic function** which maps every coalition $C \subseteq\mathcal{P}$ to a real number $\nu(C)$ (which is referred to as the **value of the coalition $C$**).  
   
 It's crucial to understand that the characteristic function game assigns a value to a coalition as a whole, **not telling how the coalition value should be divided among the members of the coalition itself.** How to divide the coalition value is a **fundamental question** in cooperative game theory.  
 Another key problem in game theory is to try to understand what the outcomes of a game will be. An *outcome* of a game $G$ consists of two parts:  
 
-1. A **coalition structure**, which is a partition of the gran coalition into coalitions ($CS = \{C_1,...,C_m\}$)
-2. A **payoff vector** $\mathbb{x} = (x_1,...,x_p)$ associated to the coalition structure which distributes the value $\mathcal{v}(C_j)$ of each coalition among its members. All its entries must be non negative and the sum of entries for players belonging to the same coalition must be lower or equal than the coalition value.
+1. A **coalition structure**, which is a partition of the gran coalition into coalitions $\big(CS = \{C_1,...,C_m\}\big)$
+2. A **payoff vector** $\mathbb{x} = (x_1,...,x_p)$ associated to the coalition structure which distributes the value $\nu(C_j)$ of each coalition among its members. All its entries must be non negative and the sum of entries for players belonging to the same coalition must be lower or equal than the coalition value.
 
 As one can imagine, **not all outcomes are equally desirable**. An outcome that pushes all agents together is (typically) preferable to an outcome that some agents want to deviate from and an outcome that shares the payoff in a fair way is desirable.  
 There are two criteria to evaluate an outcome:
@@ -29,33 +29,123 @@ There are two criteria to evaluate an outcome:
 1. **Fairness**: how well each agent's payoff reflects its contribution.
 2. **Stability**: what are the incentives for the agents to stay in the coalition structure.
 
-The **Shapley Value** belongs to a family of solution concepts which takes account mainly of the fairness of an outcome. It's defined with respect to the grand coalition: it defines a way of distributing the value $\mathcal{v}(\mathcal{P})$ that could be obtained by the *gran coalition* (so, in the case where all players are in the same coalition), and it is based on the intuition that **the payment that each agent receives should be proportional to his contribution.**  
+We'll focus on the **Shapley Value** that belongs to a family of solution concepts which takes account mainly of the fairness of an outcome. It's defined with respect to the grand coalition: it defines a way of distributing the value $\nu(\mathcal{P})$ that could be obtained by the *gran coalition* (so, in the case where all players are in the same coalition), and it is based on the intuition that **the payment that each agent receives should be proportional to his contribution.**  
 The initial idea is, given a **fixed ordering** of agents, to pay each one of them **according to how much is the increase in the value of the coalition formed by its precedessors**. The problem is that agents that play symmetric roles may receive different payoffs depending on their position in the ordering.  
 The Shapley Value removes the dependence on the agents ordering by **averaging over all possible orderings (or permutations) of the players.**  
 Some additional notation is needed to formally define the Shapley Value:
 
-1. WIP
-2. WIP
+1. $S_\pi(j)$ the set of all predecessors of player $j$ in $\pi$ defined as $S_\pi(j)= \{r \in \mathcal{P} \ \text{such tath} \ \pi(r) < \pi(j)\}$ where $\Pi_{\mathcal{P}}$ is the set of all permutations of $\mathcal{P}$ and $\pi$ is a specific permutation.  
+2. **The marginal contribution** of an agent $j$ with respect to a permutation $\pi$ in a game $G = (\mathcal{P}, \nu)$, that is $$\Delta_\pi^G(j) = \nu(S_\pi(j) \cup \{j\} ) - \nu(S_\pi(j))$$
+and measures how much player $j$ increases the value of the coalition consisting of its predecessor in $\pi$.  
 
-Now, we can define the Shapley Value $\psi^G(j)$ (for a game $G$ and a player $j$) as **the average marginal contribution of the player $j$**, where the average is taken **over all permutations** of the player set (assumed to be **all equally likely**):
+Now, we can define the **Shapley Value** $\psi^G(j)$ (for a game $G$ and a player $j$) as **the average marginal contribution of the player $j$**, where the average is taken **over all permutations** of the player set (assumed to be **all equally likely**):
 
 \begin{align}
-\psi^G(j) = \mathbb{E}_{\pi}\left(\Delta_{\pi}^{G}(j)\right) = \frac{1}{p!} \sum_{\pi \in \Pi_{\mathcal{P}}} \Delta_{\pi}^{G}(j) = \sum_{C : j \notin C} \frac{(\#C)!(p-1-\#C)!}{p!}\left(\mathcal{v}(C\cup\{j\})-\mathcal{v}(C)\right)
+\psi^G(j) = \mathbb{E}_{\pi}\left(\Delta_{\pi}^{G}(j)\right) = \frac{1}{p!} \sum_{\pi \in \Pi_{\mathcal{P}}} \Delta_{\pi}^{G}(j) = \sum_{C : j \notin C} \frac{(\#C)!(p-1-\#C)!}{p!}\left(\nu(C\cup\{j\})-\nu(C)\right)
 \end{align}
 
-Please note that the marginal contributions $\Delta_{\pi}^{G}(j)$ are of the form $\mathcal{v}(C\cup\{j\})-\mathcal{v}(C)$, where $C$ is a coalition not containing the player $j$. Also, there are $(\#C)!$ possible orderings of $C$ and $(p-1-\#C)!$ possible orderings of $\mathcal{P}\setminus(C\cup\{j\})$.  
+Please note that the marginal contributions $\Delta_{\pi}^{G}(j)$ are of the form $\nu(C\cup\{j\})-\nu(C)$, where $C$ is a coalition not containing the player $j$. Also, there are $(\#C)!$ possible orderings of $C$ and $(p-1-\#C)!$ possible orderings of $\mathcal{P}\setminus(C\cup\{j\})$.  
 It is shown that the Shapley Value is **the only payoff division scheme** that has all these four properties:
 
-- **Efficiency**: WIP
-- **Dummy player**: WIP
-- **Symmetry**: WIP 
-- **Additivity**: WIP
+- **Efficiency**: $\sum_{j} \psi^G(j) = \nu(\mathcal{P})$.
+- **Dummy player**: if player $j$ is dummy (i.e., $\nu(C \cup \{j\}) = \nu(C)$ for any coalition $C$), then $\psi^G(j) = 0$.
+- **Symmetry**: if $j_1$ and $j_2$ are symmetric players (i.e., $\nu(C \cup \{j_1\}) = \nu(C \cup \{j_2\})$ for any coalition $C$), then $\psi^{G}(j_1) = \psi^{G}(j_2)$.  
+- **Additivity**: given any two characteristic function games $G_1 = (\mathcal{P},\nu_1)$ and $G_2 = (\mathcal{P},\nu_2)$, and their sum $G^+ = (\mathcal{P},\nu_1 + \nu_2)$, $$\psi^+(j) = \psi^G_1(j) + \psi^G_2(j) \text{ for all } j \in \mathcal{P}.$$ 
 
 In **simple games** (monotone and with characteristic function which only takes values 0 and 1), the Shapley Value measures the *power of the player*, the probability that it can influence the outcome of the game. To be more precise, it is the **probability that the player $j$ turns a losing coalition into a winning one.**  
-WIP - BRIEF DESCRIPTION OF SHAPLEY VALUE FOR VARIABLE IMPORTANCE  
+
+The last important concept to stress is that the **Shaley value** can be used to determine the importance of different variables (**covariates**) in a supervised learning problem. It casts the problem as a game where the **covariates are players** and the **measure of fit is the characteristic function.** **The value of a coalition of covariates is the negative expected squared difference between the actual and predicted outcomes.** The Shapley value represents the **average contribution of a covariate to the predictive accuracy across all possible combinations of covariates.**   
+
+An important remark regarding the Shapley value is that while it offer a comprehensive importance measure, **it isn't without limitations**, such as being affected by covariate correlation.
 
 ## Exercise 1: Get a better understanding of Games and Shapley
-WIP
+
+In this first exercise, given a game with 3 player, **Antwohnette (A), BadellPadel (B) and Chumbawamba (C)** we are asked to complete the definition of the **characteristic function game, $\nu$**, and then to calculate the **Shapley value**.  
+
+Taking into account the definition of the **characteristic function game $\nu$** above we can claim that:  
+
+- $\mathcal{P}=\{A,B,C\}$ is the set of our agents (our players).  
+- $\nu: 2^\mathcal{P} \rightarrow \mathbb{R}$ is our **characteristic function** that we have to find.
+
+From the text of the exercise we know that:
+
+- $\nu(A)=\nu(B)=\nu(C)=0$    
+- $\nu(ABC)=4$    
+
+Now we have to find the other value of $\nu$ associated with the others combinations of our players and so we have to find $\nu(AB)$, $\nu(AC)$ and $\nu(BC)$.  
+Let's start with the definition of our $\nu(C)$ that is **the numbers of hours potentially saved by well organized coalition**, so in order to get our values we have to find the hours in which each pair of players saves time by working together and thus we must numerically count the hours in which our players are dedicated to solving the homework at the same time. 
+From the setup of the game we know that:  
+
+- **Player A works from 14:00 to 17:00**  
+- **Player B works from 11:00 to 16:00**  
+- **Player C works from 9:00 to 13:00** 
+
+An so we can claim that:  
+
+- $\nu(AB)=2$, because the hours in which both A and B are dedicated to solving the homework are exactly 2, from 14:00 to 16:00.   
+- $\nu(AC)=0$, because Because A and C never have hours in common to work together on the homework and thus 'team up'.  
+- $\nu(BC)=2$, because the hours in which both A and B are dedicated to solving the homework are exactly 2, from 11:00 to 13:00.  
+
+We have thus completed the definition of $\nu$ and we can proceed to calculate the **Shaplay value**.  We have $\mathcal{P}=\{A,B,C\}$ so the number of the permutation of a set of 3 elements is $3!=6$.  
+Due to this we have to analyze $6$ permutations, let's denote $\Pi_\mathcal{P}$ the set of all permutations of $\mathcal{P}$, with this notation we have to focus on: $$\Pi_\mathcal{P}=\{(A,B,C), (A,C,B), (B,A,C), (B,C,A), (C,A,B), (C,B,A)\}$$ 
+In order to get, $\Delta_\pi^G(j) = \nu(S_\pi(j) \cup \{j\} ) - \nu(S_\pi(j))$, that is the **marginal contribution** of each player calculated recurring to, $S_\pi(j)$, the set of all predecessors of player $j$, where $j \in \{A,B,C\}$, in each permutation, $\pi$, we have to analyze each permutation at time:
+
+- $(A,B,C):$ 
+    - $\Delta_\pi^G(A) = \nu(S_\pi(A) \cup \{A\} ) - \nu(S_\pi(A))= \nu(\emptyset \cup \{A\} ) - \nu(\emptyset) = \nu(A) - \nu(\emptyset)=0$   
+    - $\Delta_\pi^G(B) = \nu(S_\pi(B) \cup \{B\} ) - \nu(S_\pi(B))=\nu(\{A\} \cup \{B\} ) - \nu(A) = \nu(AB) - \nu(A)=2-0=2$  
+    - $\Delta_\pi^G(C) = \nu(S_\pi(C) \cup \{C\} ) - \nu(S_\pi(C))= \nu(\{A,B\} \cup \{C\} ) - \nu(AB) = \nu(ABC) - \nu(AB)=4-2=2$  
+- $(A,C,B):$
+    - $\Delta_\pi^G(A) = 0.$  
+    Because the calculation here is the same of the the previous step because the $A$ is in the same position in the permutation so its **marginal contribution** is the same.
+    - $\Delta_\pi^G(C) = \nu(S_\pi(C) \cup \{C\} ) - \nu(S_\pi(C))= \nu(\{A\} \cup \{C\} ) - \nu(A) = \nu(AC) - \nu(A)=0-0=0$  
+    - $\Delta_\pi^G(B) = 4$  
+    We can claim this because $\sum_{j\in \pi}\Delta_\pi^G(j)=\nu(A,B,C)=4$ so since we know that $\Delta_\pi^G(A) = 4$ and $\Delta_\pi^G(C) =0$ definitely $\Delta_\pi^G(B) = 4.$  
+- $(B,A,C):$
+    - $\Delta_\pi^G(B) = \nu(S_\pi(B) \cup \{B\} ) - \nu(S_\pi(B))=\nu(\emptyset \cup \{B\} ) - \nu(\emptyset) = \nu(B) - \nu(\emptyset)=0-0=0$  
+    - $\Delta_\pi^G(A) = \nu(S_\pi(A) \cup \{A\} ) - \nu(S_\pi(A))=\nu(\{B\} \cup \{A\} ) - \nu(B)= \nu(AB) - \nu(B)=2-0=2$  
+    - $\Delta_\pi^G(C) = 2$  
+    The reason behind this result is the same of the previous step $\big(\sum_{j\in \pi}\Delta_\pi^G(j)=\nu(A,B,C)=4\big).$    
+- $(B,C,A):$
+    - $\Delta_\pi^G(B) = 0$  
+    Because the calculation here is the same of the the previous step because the $B$ is in the same position in the permutation so its **marginal contribution** is the same.
+    - $\Delta_\pi^G(C) = \nu(S_\pi(C) \cup \{C\} ) - \nu(S_\pi(C)) = \nu(\{B\} \cup \{C\} ) - \nu(B)=\nu(BC) - \nu(B) = 2-0=2$  
+    - $\Delta_\pi^G(A) = 2$  
+    Due to the fact that $\sum_{j\in \pi}\Delta_\pi^G(j)=\nu(A,B,C)=4$ we have this result.  
+- $(C,A,B):$  
+    - $\Delta_\pi^G(C) = \nu(S_\pi(C) \cup \{C\} ) - \nu(S_\pi(C))=\nu(\emptyset \cup \{C\} ) - \nu(\emptyset) = \nu(C) - \nu(\emptyset)=0-0=0$ 
+    - $\Delta_\pi^G(A) = \nu(S_\pi(A) \cup \{A\} ) - \nu(S_\pi(A))=\nu(\{C\} \cup \{A\} ) - \nu(C) = \nu(AC) - \nu(C)=0-0=0$ 
+    - $\Delta_\pi^G(B) = 4$  
+    Here again the result it is this due to the fact that $\sum_{j\in \pi}\Delta_\pi^G(j)=\nu(A,B,C)=4.$
+- $(C,B,A):$  
+    - $\Delta_\pi^G(C) = 0$  
+    Because the calculation here is the same of the the previous step because the $B$ is in the same position in the permutation so its **marginal contribution** is the same. 
+    - $\Delta_\pi^G(B) = \nu(S_\pi(B) \cup \{B\} ) - \nu(S_\pi(B))=\nu(\{C\} \cup \{B\} ) - \nu(C) = \nu(BC) - \nu(C)=2-0=2$
+    - $\Delta_\pi^G(A) = 2$  
+    Here again the result it is this due to the fact that $\sum_{j\in \pi}\Delta_\pi^G(j)=\nu(A,B,C)=4.$  
+    
+So to summarize all the calculations in a table we have:  
+
+\[
+\begin{array}{c|ccc}
+\text{Permutation} & \text{Player A} & \text{Player B} & \text{Player C} \\ \hline
+ABC & 0 & 2 & 2 \\
+ACB & 0 & 4 & 0 \\
+BAC & 2 & 0 & 2 \\
+BCA & 2 & 0 & 2 \\
+CAB & 0 & 4 & 0 \\
+CBA & 2 & 2 & 0 \\ \hline
+\text{TOTAL VALUE} & 6 & 12 & 6 \\
+\end{array}
+\]
+
+At this point, we have everything to calculate the **Shapley value**. First of all, remember that the **Shapley value** of each player $j$, where $j \in \{A,B,C\}$ is the function that calculates the average marginal contribution of each players, taken over all permutations of the player-set, in particular we have: $$\psi^G(j)=\mathbb{E}[\Delta_\pi^G(j)]=\frac{1}{p!}\sum_{\pi \in \Pi_\mathcal{P}} \Delta_\pi^G(j)$$ 
+In our scenario we have $3!=6$ permutations and for each player we have:  
+- **Player A:** $\sum_{\pi \in \Pi_\mathcal{P}} \Delta_\pi^G(A)=6$  
+- **Player B:** $\sum_{\pi \in \Pi_\mathcal{P}} \Delta_\pi^G(B)=12$    
+- **Player C:** $\sum_{\pi \in \Pi_\mathcal{P}} \Delta_\pi^G(C)=6$  
+So in the end we can claim that:  
+$$\psi^G(A)=\frac{6}{6}=1 \\ \psi^G(B)=\frac{12}{6}=2 \\ \psi^G(C)=\frac{6}{6}=1$$ 
+**If we read this value in the context of the exercise they suggest to us that Antwohnette and Chumbawamba have potentially saved 1 hour by well organized coalition, instead BadellPadel 2 hours.**
 
 ## Exercise 2: WIP
 In this exercise it is asked to leverage the theory above in a financial context. There is a **portfolio of $p$ stocks** whose returns are modeled by a set of random variables $\{X_1,...,X_p\}$. The **utility function** is defined as follows:
