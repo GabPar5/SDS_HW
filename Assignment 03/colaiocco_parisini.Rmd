@@ -58,5 +58,151 @@ WIP - BRIEF DESCRIPTION OF SHAPLEY VALUE FOR VARIABLE IMPORTANCE
 WIP
 
 ## Exercise 2: WIP
+In this exercise it is asked to leverage the theory above in a financial context. There is a **portfolio of $p$ stocks** whose returns are modeled by a set of random variables $\{X_1,...,X_p\}$. The **utility function** is defined as follows:
+\begin{align}
+U_{\omega}(X) = \mathbb{E}(X) - \omega\cdot\mathbb{V}ar(X) \quad \text{for some weight} \quad \omega > 0
+\end{align}
+It's basically a linear combination of the average return and volatility of the portfolio. The problem consists in deciding how to allocate the capital among all of the stocks: intuitively, it would be good that the allocation is proportional to the asset's contribution to the total utility $U_{\omega}(\sum_{j=1}^pX_j)$.  
+We now define this setting in a **cooperative game theory prespective**. Let the assets be the players and let $C$ be any coalition of them, with $R_C = \sum_{j\in C}X_j$ being their return. For any $C\subset\mathcal{P}$ we define the characteristic function as follows:
+\begin{align}
+\mathcal{v}(C) = U_{\omega}(R_C) = \mathbb{E}(R_C) - \omega\cdot\mathbb{V}ar(R_C) = \mathcal{v}_{\mathbb{E}}(C) - \omega\cdot\mathcal{v}_{\mathbb{V}}(C)
+\end{align}
+Hence, the game we're defining $(G = (\mathcal{P},\mathcal{v}))$ is a linear combination of two other games: $G_{\mathbb{E}} = (\mathcal{P},\mathcal{v}_{\mathbb{E}})$ and $G_{\mathbb{V}} = (\mathcal{P},\mathcal{v}_{\mathbb{V}})$.  
+Since our goal is to allocate the capital proportionally to the contribution given to the total utility, the Shapley Value turns out to be suitable and simple.  
+By the **additivity of the Shapley Value** we get that:
+\begin{align}
+\psi^G(j) = \psi^G_{\mathbb{E}}(j) - \omega\cdot \psi^G_{\mathbb{V}}(j)
+\end{align}
+By the **linearity of expectation**, the first term is:
+\begin{align}
+\psi^G_{\mathbb{E}}(j) = \mathbb{E}(X_j)
+\end{align}
+While the second term, after elementary manipulations, turns out to be:
+\begin{align}
+\psi^G_{\mathbb{V}}(j) = \mathbb{C}ov(X_j,R_{\mathcal{P}})
+\end{align}
+In conclusion, after picking a suitable weight $\omega > 0$, the Shapley allocation to each stock is given by:
+\begin{align}
+\psi^G(j) = \mathbb{E}(X_j) - \omega\cdot\mathbb{C}ov(X_j,R_{\mathcal{P}}) = \mathbb{E}(X_j) - \omega\cdot\sum_{r=1}^p\mathbb{C}ov(X_j,X_r)
+\end{align}
+In other words, the **Shapley Value used to allocate capital is a population quantity to be estimated**. By taking a look at the formula, it can be notices that we would need to study the marginal correlation graph among some standard measure of stock *relative performance* (which may be calculated starting from the *daily closing prices* of the stocks).  
+In practice, we need to:  
+
+- Select a sensibly sized portfolio of $p$ stocks and take their *closing price* from **January 1, 2020 till the end of 2023.**
+- From the closing prices $c_{t,j}$ (stock $j$ on day $t$), we have to **compute their relative variation** WIP $x_{t,j} = \log(c_{t,j}/c_{t-1,j})$.
+- By seeing each stock as a node, we have to **estimate the Pearson-based correlation graph over stocks**, by treating the instances $\{x_{t,j}\}_t$ as independent samples (even though they're not). We place an undirected edge between stocks $j1$ and $j2$ only if their estimated Pearson correlation is large enough (statistically significative or over a threshold $\tau > 0$). Beware of multiplicity when choosing the threshold! 
+- After **properly visualizing the graph**, we have to draw some conclusions based on the decisions made along the way.
+- Finally, we have to **provide and visualize bootstrapped confidence intervals for the Shapley Values** of the stocks in our portfolio and comment the results based on the choices we've made.
+
+Energy, Information Technology, health care, Consumer Discrectionary, Financials. Due per settore
+
+- ENI (ITALY)
+- SUMISEKI HOLDINGS (JAPAN)
+- APPLE (USA)
+- MICROSOFT (USA)
+- MC DONALDS (USA)
+- CARREFOUR (FRANCIA)
+- BAYER (GERMANIA)
+- CIPLA (INDIA)
+- BLACKROCK (USA)
+- JP MORGAN (USA)
 
 
+
+WIP - DESCRIBE THE STOCKS CHOSEN AND THE LABELS ASSIGNED
+```{r, echo=TRUE}
+# PREPROCESSING PART 1
+# Get stocks data with the library 'tseries'
+library(tseries, quietly = T)
+options("getSymbols.warning4.0" = FALSE)
+
+# Let's pull data about the chosen stocks
+eni <- get.hist.quote(instrument="E", start="2020-01-01", end="2023-12-31", quote= c("Open","Close"), provider="yahoo", drop=TRUE, quiet = TRUE)
+
+smh <- get.hist.quote(instrument="1514.T", start="2020-01-01", end="2023-12-31", quote= c("Open","Close"), provider="yahoo", drop=TRUE, quiet = TRUE)
+
+aapl <- get.hist.quote(instrument="AAPL", start="2020-01-01", end="2023-12-31", quote= c("Open","Close"), provider="yahoo", drop=TRUE, quiet = TRUE)
+
+micro <- get.hist.quote(instrument="MSFT", start="2020-01-01", end="2023-12-31", quote= c("Open","Close"), provider="yahoo", drop=TRUE, quiet = TRUE)
+
+mcd <- get.hist.quote(instrument="MCD", start="2020-01-01", end="2023-12-31", quote= c("Open","Close"), provider="yahoo", drop=TRUE, quiet = TRUE)
+
+carf <- get.hist.quote(instrument="CA.PA", start="2020-01-01", end="2023-12-31", quote= c("Open","Close"), provider="yahoo", drop=TRUE, quiet = TRUE)
+
+bay <- get.hist.quote(instrument="BAYN.DE", start="2020-01-01", end="2023-12-31", quote= c("Open","Close"), provider="yahoo", drop=TRUE, quiet = TRUE)
+
+cipla <- get.hist.quote(instrument="CIPLA.NS", start="2020-01-01", end="2023-12-31", quote= c("Open","Close"), provider="yahoo", drop=TRUE, quiet = TRUE)
+
+brk <- get.hist.quote(instrument="BLK", start="2020-01-01", end="2023-12-31", quote= c("Open","Close"), provider="yahoo", drop=TRUE, quiet = TRUE)
+
+jpm <- get.hist.quote(instrument="JPM", start="2020-01-01", end="2023-12-31", quote= c("Open","Close"), provider="yahoo", drop=TRUE, quiet = TRUE)
+
+# Fill eventual holidays to prevent different series' length
+eni <- zoo::na.approx(eni, xout = seq(start(smh), end(eni), by = "day"), method = "constant")
+smh <- zoo::na.approx(smh, xout = seq(start(smh), end(smh), by = "day"), method = "constant")
+aapl <- zoo::na.approx(aapl, xout = seq(start(smh), end(aapl), by = "day"), method = "constant")
+micro <- zoo::na.approx(micro, xout = seq(start(smh), end(micro), by = "day"), method = "constant")
+mcd <- zoo::na.approx(mcd, xout = seq(start(smh), end(mcd), by = "day"), method = "constant")
+carf <- zoo::na.approx(carf, xout = seq(start(smh), end(carf), by = "day"), method = "constant")
+bay <- zoo::na.approx(bay, xout = seq(start(smh), end(bay), by = "day"), method = "constant")
+cipla <- zoo::na.approx(cipla, xout = seq(start(smh), end(cipla), by = "day"), method = "constant")
+brk <- zoo::na.approx(brk, xout = seq(start(smh), end(brk), by = "day"), method = "constant")
+jpm <- zoo::na.approx(jpm, xout = seq(start(smh), end(jpm), by = "day"), method = "constant")
+
+# Compute their relative log-returns
+eni$y = diff(log(eni$Close))
+smh$y = diff(log(smh$Close))
+aapl$y = diff(log(aapl$Close))
+micro$y = diff(log(micro$Close))
+mcd$y = diff(log(mcd$Close))
+carf$y = diff(log(carf$Close))
+bay$y = diff(log(bay$Close))
+cipla$y = diff(log(cipla$Close))
+brk$y = diff(log(brk$Close))
+jpm$y = diff(log(jpm$Close))
+```
+
+```{r, echo=FALSE, fig.width=10, fig.height=8, fig.align='center', out.width = '200%', out.height = '400%', dpi = 300}
+# Now, let's visualize the closing prices of the chosen stocks along with their relative log-returns
+plot(cbind(eni$Close,smh$Close,aapl$Close,micro$Close,mcd$Close,carf$Close,bay$Close,cipla$Close,brk$Close,jpm$Close), main = 'Stocks closing prices', xlab = 'Date', ylab = c('ENI','SMH','AAPL','MICRO','MCD','CARF','BAY','CIPLA','BRK','JPM'), cex.main = 2)
+plot(cbind(eni$y,smh$y,aapl$y,micro$y,mcd$y,carf$y,bay$y,cipla$y,brk$y,jpm$y), main = 'Stocks relative log-returns', xlab = 'Date', ylab = c('ENI','SMH','AAPL','MICRO','MCD','CARF','BAY','CIPLA','BRK','JPM'), cex.main = 2)
+```
+
+```{r, echo=TRUE}
+# PREPROCESSING PART 2
+# Create a dataframe of the relative log-returns for each stock
+# We've decided to drop the first value as the relative log-return can't be calculated for the first day
+eni <- as.data.frame(eni$y[-1])
+eni$dates <- rownames(eni)
+smh <- as.data.frame(smh$y[-1])
+smh$dates <- rownames(smh)
+aapl <- as.data.frame(aapl$y[-1])
+aapl$dates <- rownames(aapl)
+micro <- as.data.frame(micro$y[-1])
+micro$dates <- rownames(micro)
+mcd <- as.data.frame(mcd$y[-1])
+mcd$dates <- rownames(mcd)
+carf <- as.data.frame(carf$y[-1])
+carf$dates <- rownames(carf)
+bay <- as.data.frame(bay$y[-1])
+bay$dates <- rownames(bay)
+cipla <- as.data.frame(cipla$y[-1])
+cipla$dates <- rownames(cipla)
+brk <- as.data.frame(brk$y[-1])
+brk$dates <- rownames(brk)
+jpm <- as.data.frame(jpm$y[-1])
+jpm$dates <- rownames(jpm)
+
+# Join the datasets together to get a data matrix of their relative log-returns
+df <- plyr::join_all(list(eni,smh,aapl,micro,mcd,carf,bay,cipla,brk,jpm), by = 'dates', type = 'full')
+df <- subset(df, select = -c(dates))
+colnames(df) <- c('eni','smh','aapl','micro','mcd','carf','bay','cipla','brk','jpm')
+
+# Print the correlation matrix between stocks
+corr_mat <- cor(df)
+# WIP - Prettify it
+knitr::kable(corr_mat ,  caption = "Correlation Matrix")
+```
+
+WIP - SEARCH HOW TO GET NORMAL CI FOR PEARSON'S CORRELATION IN R, SELECT A THRESHOLD AND BUILD THE GRAPH
+WIP - PLOT THE GRAPH WITH IGRAPHR AND COMMENT
