@@ -478,16 +478,16 @@ WIP bla bla bla introduction
 # Bootstrap CIs for Shapley Values
 B = 10000 # Number of iterations for bootstrap
 n <- nrow(df)
-shap.B <- matrix(NA, nrow = B, ncol = ncol(df)) # Bootstrap B shapley values for each stock
+shap.B <- matrix(NA, nrow = B, ncol = ncol(df)) # Bootstrap B Shapley values for each stock
 dimnames(shap.B) <- list(1:B, colnames(df)) # Rename columns
 omega <- 0.5 # Select the risk propensity
 set.seed(4545) # Set seed for reproducibility
 # Main loop - non-parametric bootstrap for Shapley Values
 for (b in 1:B){
   idx <-  sample(1:n, replace = T)
-  cov_mat <- matrix(ifelse(edges, cov(df[idx,]), 0), nrow = 10, ncol = 10) # Create a covariance matrix, fixing the covariance to zero for variables not linked in the correlation graph - WIP
+  cov_mat <- matrix(ifelse(edges, cov(df[idx,]), 0), nrow = 10, ncol = 10) # Create a covariance matrix, fixing the covariance to zero for variables not linked in the correlation graph
   for (j in 1:10){
-    shap.B[b,j] <- mean(df[idx,j]) - omega*sum(cov_mat[j,]) # shapley formula, we use the sample mean as estimator of the expected value WIP and the adjacency matrix of the correlation graph to retrieve the covariance between the variables
+    shap.B[b,j] <- mean(df[idx,j]) - omega*sum(cov_mat[j,]) # Shapley formula, we use the sample mean as estimator of the expected value (assuming that the log-returns follow a normal distribution) and the adjacency matrix of the correlation graph to retrieve the covariance between the variables
   }
 }
 
@@ -510,4 +510,4 @@ shap_ci_perc <- perc_int(shap.B,0.05)
 knitr::kable(shap_ci_perc ,  caption = "Bootstrapped Confidence Intervals for the Shapley Value of each stock")
 ```
 
-WIP - Write comment, test several values of omega and select alpha wisely. Also, check if the mean is ok to estimate the expected value of the log-returns
+WIP - Write comment, test several values of omega and select alpha wisely. Also, check if the mean is ok to estimate the expected value of the log-returns. If the CI is strictly positive then the r.v. contributes hedging a risk and vice-versa. If zero is included nothing can be said. We assume that log-returns are normally distributed, hence the sample mean can be used to estimate their expected value
