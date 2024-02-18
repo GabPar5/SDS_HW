@@ -34,9 +34,9 @@ The initial idea is, given a **fixed ordering** of agents, to pay each one of th
 The Shapley Value removes the dependence on the agents ordering by **averaging over all possible orderings (or permutations) of the players.**  
 Some additional notation is needed to formally define the Shapley Value:
 
-1. $S_\pi(j)$ the set of all predecessors of player $j$ in $\pi$ defined as $S_\pi(j)= \{r \in \mathcal{P} \ \text{such tath} \ \pi(r) < \pi(j)\}$ where $\Pi_{\mathcal{P}}$ is the set of all permutations of $\mathcal{P}$ and $\pi$ is a specific permutation.  
-2. **The marginal contribution** of an agent $j$ with respect to a permutation $\pi$ in a game $G = (\mathcal{P}, \nu)$, that is $$\Delta_\pi^G(j) = \nu(S_\pi(j) \cup \{j\} ) - \nu(S_\pi(j))$$
-and measures how much player $j$ increases the value of the coalition consisting of its predecessor in $\pi$.  
+1. $S_\pi(j)$ is the set of all predecessors of player $j$ in the permutation $\pi \in \Pi_{\mathcal{P}}$ (where $\Pi_{\mathcal{P}}$ is the set of all permutations of $\mathcal{P}$). It's defined as $S_\pi(j)= \{r \in \mathcal{P} \ \text{such that} \ \pi(r) < \pi(j)\}$.  
+2. **The marginal contribution** of an agent $j$ with respect to a permutation $\pi$ in a game $G = (\mathcal{P}, \nu)$ is $$\Delta_\pi^G(j) = \nu(S_\pi(j) \cup \{j\} ) - \nu(S_\pi(j))$$
+and measures how much the player $j$ increases the value of the coalition consisting of its predecessor in $\pi$.  
 
 Now, we can define the **Shapley Value** $\psi^G(j)$ (for a game $G$ and a player $j$) as **the average marginal contribution of the player $j$**, where the average is taken **over all permutations** of the player set (assumed to be **all equally likely**):
 
@@ -54,13 +54,13 @@ It is shown that the Shapley Value is **the only payoff division scheme** that h
 
 In **simple games** (monotone and with characteristic function which only takes values 0 and 1), the Shapley Value measures the *power of the player*, the probability that it can influence the outcome of the game. To be more precise, it is the **probability that the player $j$ turns a losing coalition into a winning one.**  
 
-The last important concept to stress is that the **Shaley value** can be used to determine the importance of different variables (**covariates**) in a supervised learning problem. It casts the problem as a game where the **covariates are players** and the **measure of fit is the characteristic function.** **The value of a coalition of covariates is the negative expected squared difference between the actual and predicted outcomes.** The Shapley value represents the **average contribution of a covariate to the predictive accuracy across all possible combinations of covariates.**   
+The last important concept to stress is that the **Shapley value** can be used to determine the importance of the variables (**covariates**) involved in a supervised learning problem. It casts the problem as a game where the **covariates are players** and the **measure of fit is the characteristic function.** **The value of a coalition of covariates is the negative expected squared difference between the actual and predicted outcomes.** The Shapley value represents the **average contribution of a covariate to the predictive accuracy across all possible combinations of covariates.**   
 
-An important remark regarding the Shapley value is that while it offer a comprehensive importance measure, **it isn't without limitations**, such as being affected by covariate correlation.
+An important remark regarding the Shapley value is that while it offers a comprehensive importance measure, **it doesn't come without limitations**, such as being affected by covariate correlation.
 
 ## Exercise 1: Get a better understanding of Games and Shapley
 
-In this first exercise, given a game with 3 player, **Antwohnette (A), BadellPadel (B) and Chumbawamba (C)** we are asked to complete the definition of the **characteristic function game, $\nu$**, and then to calculate the **Shapley value**.  
+In this first exercise, given a game with 3 players, **Antwohnette (A), BadellPadel (B) and Chumbawamba (C)** we are asked to complete the definition of the **characteristic function game, $\nu$**, and then to calculate the **Shapley value**.  
 
 Taking into account the definition of the **characteristic function game $\nu$** above we can claim that:  
 
@@ -72,8 +72,8 @@ From the text of the exercise we know that:
 - $\nu(A)=\nu(B)=\nu(C)=0$    
 - $\nu(ABC)=4$    
 
-Now we have to find the other value of $\nu$ associated with the others combinations of our players and so we have to find $\nu(AB)$, $\nu(AC)$ and $\nu(BC)$.  
-Let's start with the definition of our $\nu(C)$ that is **the numbers of hours potentially saved by well organized coalition**, so in order to get our values we have to find the hours in which each pair of players saves time by working together and thus we must numerically count the hours in which our players are dedicated to solving the homework at the same time. 
+Now we have to find the other value of $\nu$ associated with the other combinations of our players, so we have to find $\nu(AB)$, $\nu(AC)$ and $\nu(BC)$.  
+Let's start with the definition of our $\nu(C)$, that is **the numbers of hours potentially saved by well organized coalition**. In order to get our values we have to find the time window in which each pair of players saves time by working together and thus we must numerically count the hours in which our players are dedicated to solving the homework at the same time. 
 From the setup of the game we know that:  
 
 - **Player A works from 14:00 to 17:00**  
@@ -83,12 +83,12 @@ From the setup of the game we know that:
 An so we can claim that:  
 
 - $\nu(AB)=2$, because the hours in which both A and B are dedicated to solving the homework are exactly 2, from 14:00 to 16:00.   
-- $\nu(AC)=0$, because Because A and C never have hours in common to work together on the homework and thus 'team up'.  
+- $\nu(AC)=0$, because A and C never have hours in common to work together on the homework and thus to 'team up'.  
 - $\nu(BC)=2$, because the hours in which both A and B are dedicated to solving the homework are exactly 2, from 11:00 to 13:00.  
 
-We have thus completed the definition of $\nu$ and we can proceed to calculate the **Shaplay value**.  We have $\mathcal{P}=\{A,B,C\}$ so the number of the permutation of a set of 3 elements is $3!=6$.  
-Due to this we have to analyze $6$ permutations, let's denote $\Pi_\mathcal{P}$ the set of all permutations of $\mathcal{P}$, with this notation we have to focus on: $$\Pi_\mathcal{P}=\{(A,B,C), (A,C,B), (B,A,C), (B,C,A), (C,A,B), (C,B,A)\}$$ 
-In order to get, $\Delta_\pi^G(j) = \nu(S_\pi(j) \cup \{j\} ) - \nu(S_\pi(j))$, that is the **marginal contribution** of each player calculated recurring to, $S_\pi(j)$, the set of all predecessors of player $j$, where $j \in \{A,B,C\}$, in each permutation, $\pi$, we have to analyze each permutation at time:
+We have thus completed the definition of $\nu$ and we can proceed to calculate the **Shapley value**.  We have $\mathcal{P}=\{A,B,C\}$: the number of the permutations of a set of 3 elements is $3!=6$.  
+Due to this we have to analyze the following $6$ permutations: $$\Pi_\mathcal{P}=\{(A,B,C), (A,C,B), (B,A,C), (B,C,A), (C,A,B), (C,B,A)\}$$ 
+In order to get $\Delta_\pi^G(j) = \nu(S_\pi(j) \cup \{j\} ) - \nu(S_\pi(j))$ we have to analyze each permutation at time:
 
 - $(A,B,C):$ 
     - $\Delta_\pi^G(A) = \nu(S_\pi(A) \cup \{A\} ) - \nu(S_\pi(A))= \nu(\emptyset \cup \{A\} ) - \nu(\emptyset) = \nu(A) - \nu(\emptyset)=0$   
@@ -99,7 +99,7 @@ In order to get, $\Delta_\pi^G(j) = \nu(S_\pi(j) \cup \{j\} ) - \nu(S_\pi(j))$, 
     Because the calculation here is the same of the the previous step because the $A$ is in the same position in the permutation so its **marginal contribution** is the same.
     - $\Delta_\pi^G(C) = \nu(S_\pi(C) \cup \{C\} ) - \nu(S_\pi(C))= \nu(\{A\} \cup \{C\} ) - \nu(A) = \nu(AC) - \nu(A)=0-0=0$  
     - $\Delta_\pi^G(B) = 4$  
-    We can claim this because $\sum_{j\in \pi}\Delta_\pi^G(j)=\nu(A,B,C)=4$ so since we know that $\Delta_\pi^G(A) = 4$ and $\Delta_\pi^G(C) =0$ definitely $\Delta_\pi^G(B) = 4.$  
+    We can claim this because $\sum_{j\in \pi}\Delta_\pi^G(j)=\nu(A,B,C)=4$ so since we know that $\Delta_\pi^G(A) = 0$ and $\Delta_\pi^G(C) =0$ definitely $\Delta_\pi^G(B) = 4.$  
 - $(B,A,C):$
     - $\Delta_\pi^G(B) = \nu(S_\pi(B) \cup \{B\} ) - \nu(S_\pi(B))=\nu(\emptyset \cup \{B\} ) - \nu(\emptyset) = \nu(B) - \nu(\emptyset)=0-0=0$  
     - $\Delta_\pi^G(A) = \nu(S_\pi(A) \cup \{A\} ) - \nu(S_\pi(A))=\nu(\{B\} \cup \{A\} ) - \nu(B)= \nu(AB) - \nu(B)=2-0=2$  
@@ -118,7 +118,7 @@ In order to get, $\Delta_\pi^G(j) = \nu(S_\pi(j) \cup \{j\} ) - \nu(S_\pi(j))$, 
     Here again the result it is this due to the fact that $\sum_{j\in \pi}\Delta_\pi^G(j)=\nu(A,B,C)=4.$
 - $(C,B,A):$  
     - $\Delta_\pi^G(C) = 0$  
-    Because the calculation here is the same of the the previous step because the $B$ is in the same position in the permutation so its **marginal contribution** is the same. 
+    Because the calculation here is the same of the the previous step because the $C$ is in the same position in the permutation so its **marginal contribution** is the same. 
     - $\Delta_\pi^G(B) = \nu(S_\pi(B) \cup \{B\} ) - \nu(S_\pi(B))=\nu(\{C\} \cup \{B\} ) - \nu(C) = \nu(BC) - \nu(C)=2-0=2$
     - $\Delta_\pi^G(A) = 2$  
     Here again the result it is this due to the fact that $\sum_{j\in \pi}\Delta_\pi^G(j)=\nu(A,B,C)=4.$  
@@ -138,14 +138,14 @@ CBA & 2 & 2 & 0 \\ \hline
 \end{array}
 \]
 
-At this point, we have everything to calculate the **Shapley value**. First of all, remember that the **Shapley value** of each player $j$, where $j \in \{A,B,C\}$ is the function that calculates the average marginal contribution of each players, taken over all permutations of the player-set, in particular we have: $$\psi^G(j)=\mathbb{E}[\Delta_\pi^G(j)]=\frac{1}{p!}\sum_{\pi \in \Pi_\mathcal{P}} \Delta_\pi^G(j)$$ 
+At this point, we have everything to calculate the **Shapley value**. First of all, remember that the **Shapley value** of each player $j$ (where $j \in \{A,B,C\}$ in our case) is the function that calculates the average marginal contribution of each players, taken over all permutations of the player-set, in particular we have: $$\psi^G(j)=\mathbb{E}[\Delta_\pi^G(j)]=\frac{1}{p!}\sum_{\pi \in \Pi_\mathcal{P}} \Delta_\pi^G(j)$$ 
 In our scenario we have $3!=6$ permutations and for each player we have:  
 - **Player A:** $\sum_{\pi \in \Pi_\mathcal{P}} \Delta_\pi^G(A)=6$  
 - **Player B:** $\sum_{\pi \in \Pi_\mathcal{P}} \Delta_\pi^G(B)=12$    
 - **Player C:** $\sum_{\pi \in \Pi_\mathcal{P}} \Delta_\pi^G(C)=6$  
 So in the end we can claim that:  
 $$\psi^G(A)=\frac{6}{6}=1 \\ \psi^G(B)=\frac{12}{6}=2 \\ \psi^G(C)=\frac{6}{6}=1$$ 
-**If we read this value in the context of the exercise they suggest to us that Antwohnette and Chumbawamba have potentially saved 1 hour by well organized coalition, instead BadellPadel 2 hours.**
+**Interpreting this value in the given context suggests us that Antwohnette and Chumbawamba can potentially save 1 hour by forming a well organized coalition, while BadellPadel can save 2 hours.**
 
 ## Exercise 2: WIP
 In this exercise it is asked to leverage the theory above in a financial context. There is a **portfolio of $p$ stocks** whose returns are modeled by a set of random variables $\{X_1,...,X_p\}$. The **utility function** is defined as follows:
@@ -203,8 +203,7 @@ WIP - DESCRIBE THE STOCKS CHOSEN AND THE LABELS ASSIGNED
 ```{r, echo=TRUE}
 # PREPROCESSING PART 1
 # Get stocks data with the library 'tseries'
-library(tseries, quietly = T)
-options("getSymbols.warning4.0" = FALSE)
+suppressPackageStartupMessages(library(tseries, quietly=T))
 
 # Let's pull data about the chosen stocks
 eni <- get.hist.quote(instrument="E", start="2020-01-01", end="2023-12-31", quote= c("Open","Close"), provider="yahoo", drop=TRUE, quiet = TRUE)
@@ -287,12 +286,164 @@ jpm$dates <- rownames(jpm)
 df <- plyr::join_all(list(eni,smh,aapl,micro,mcd,carf,bay,cipla,brk,jpm), by = 'dates', type = 'full')
 df <- subset(df, select = -c(dates))
 colnames(df) <- c('eni','smh','aapl','micro','mcd','carf','bay','cipla','brk','jpm')
+```
 
-# Print the correlation matrix between stocks
+Now we have to build the marginal correlation graph (thus to choose the threshold)... WIP
+```{r, echo=TRUE}
+# CHOOSING THE THRESHOLD
+# Calculate the correlation matrix between the relative log-returns of the stocks
 corr_mat <- cor(df)
+
+# We will add an edge connecting two stocks if the associated Pearson's correlation Confidence Interval doesn't intersect a symmetric interval [-tau,tau]. We've decided that tau is the lowest statistically significant Pearson's correlation coefficient overall. Since we need to understand the *global* topology of the graph, the statistical significance must be asserted by correcting the level with Bonferroni method.
+
+# In our case there are m=45 different Pearson's correlation coefficients
+# Hence, starting from a level alpha=0.05, the (Bonferroni) corrected level is
+m = 45
+alpha = 0.05
+alpha_corrected <- alpha/m # 0.001
+
+# Get a matrix with p-values for the calculated Pearson's correlations
+cor.test.p <- function(x){
+    PVAL <- function(x, y) cor.test(x, y)[['p.value']]
+    pvals <- outer(
+      colnames(x), 
+      colnames(x), 
+      Vectorize(function(i,j) PVAL(x[,i], x[,j]))
+    )
+    dimnames(pvals) <- list(colnames(x), colnames(x))
+    return(pvals)
+}
+
+# Get a matrix containing the lower bounds of the Confidence Intervals for Pearson's correlation (at the corrected level) 
+cor.test.lower <- function(x){
+    LOW <- function(x, y) cor.test(x, y, conf.level = 1-alpha_corrected)[['conf.int']][1]
+    lower_bounds <- outer(
+      colnames(x), 
+      colnames(x), 
+      Vectorize(function(i,j) LOW(x[,i], x[,j]))
+    )
+    dimnames(lower_bounds) <- list(colnames(x), colnames(x))
+    return(lower_bounds)
+}
+
+# Get a matrix containing the upper bounds of the Confidence Intervals for Pearson's correlation (at the corrected level)
+cor.test.upper <- function(x){
+    UP <- function(x, y) cor.test(x, y, conf.level = 1-alpha_corrected)[['conf.int']][2]
+    upper_bounds <- outer(
+      colnames(x), 
+      colnames(x), 
+      Vectorize(function(i,j) UP(x[,i], x[,j]))
+    )
+    dimnames(upper_bounds) <- list(colnames(x), colnames(x))
+    return(upper_bounds)
+}
+
+pvals <- cor.test.p(df)
+lower_b <- cor.test.lower(df)
+upper_b <- cor.test.upper(df)
+
+# The threshold is the minimum correlation coefficient among the statistically significant ones
+tau <- min(corr_mat[which(pvals < alpha_corrected)])
+
+# The edges which are going to be added to the graph are those corresponding to a Pearson's correlation coefficient with a CI non intersecting the interval [-tau,tau]. By doing this selection maintaining the structure of the correlation matrix we build an adjacency matrix for the graph
+edges <- (upper_b < -tau | lower_b > tau)
+# Build the adjacency matrix with correlations as weights
+adj_mat <- matrix(ifelse(edges, round(corr_mat,2), 0), nrow = 10, ncol = 10)
+
+#LA THRESHOLD È LA CORRELATION SIGNIFICATIVA PIÙ BASSA DI TUTTE - WIP
+
 # WIP - Prettify it
 knitr::kable(corr_mat ,  caption = "Correlation Matrix")
 ```
 
-WIP - SEARCH HOW TO GET NORMAL CI FOR PEARSON'S CORRELATION IN R, SELECT A THRESHOLD AND BUILD THE GRAPH
-WIP - PLOT THE GRAPH WITH IGRAPHR AND COMMENT
+Here is the graph obtained WIP
+```{r, echo=FALSE, fig.width=10, fig.height=8, fig.align='center', out.width = '200%', out.height = '400%', dpi = 300}
+# GRAPH VISUALIZATION
+# Import igraph library and use it to create the graph, which is further simplified to remove duplicates and self loops
+suppressPackageStartupMessages(library(igraph, quietly=T))
+g_corr <- simplify(graph_from_adjacency_matrix(adj_mat, mode = "undirected", weighted = T))
+
+# Add node labels to make the visualization prettier
+V(g_corr)$label <- c('ENI','SUMISEKI','APPLE','MICROSOFT','MC DONALDS','CARREFOUR','BAYER','CIPLA','BLACKROCK','JP MORGAN')
+# Create a color map for the countries
+V(g_corr)$country <- c('Italy','Japan','USA','USA','USA','France','Germany','India','USA','USA')
+col <- data.frame(country = unique(V(g_corr)$country), stringsAsFactors = F)
+col$color <- c('darkgreen','white','red','royalblue','black','orange')
+# Attach the colors to the nodes
+V(g_corr)$color <- col$color[match(V(g_corr)$country, col$country)]
+
+# It's crucial to set this graphical parameter to avoid giant blank spaces at the margin of the graph
+par(mar=c(1.5,0,4.5,0)+.1)
+
+# Visualize the graph with an appropriate layout
+# We've chosen to layout them as a star, placing at the center the node with the highest strength (sum of its edges' weights)
+h_str_id <- V(g_corr)[which(strength(g_corr) == sort(strength(g_corr), decreasing = TRUE)[1])]
+layoutcorr <- layout_as_star(g_corr, center = h_str_id)
+layoutcorr <- norm_coords(layoutcorr, ymin=-1, ymax=1, xmin=-1, xmax=1)
+
+plot(g_corr,
+     rescale = F,
+     layout = layoutcorr, # Personalized layout
+     main = "Pearson's correlation Graph",
+     edge.arrow.size = 1, # Arrow size
+     edge.curved = 0.2, # Arcs curvature
+     edge.color = 'black',
+     edge.width = 1,
+     vertex.size = 5 + strength(g_corr)*3, # Nodes size (proportional to their strength)
+     vertex.frame.color = 'black',
+     vertex.frame.width = 2,
+     vertex.label = V(g_corr)$label, # Decide whether to use the attribute "label" from nodes
+     vertex.label.cex = 0.7 + strength(g_corr)/10, # Nodes' labels size
+     vertex.label.color='black',
+     vertex.label.dist=2.1,
+     vertex.label.degree = c(0,-(2/9)*pi,-(4/9)*pi,-(2/3)*pi,-(7/9)*pi,-(11/9)*pi,-(13/9)*pi,-(15/9)*pi,-pi/2,-(15/9)*pi),
+     vertex.label.font = 2) # Bold font 
+
+legend("topright", legend = col$country, pt.bg=col$color, bty="n",
+       pch=21, col="#777777", cex = 1.2, title = as.expression(bquote(bold("Country"))), title.adj = 0.5)
+
+# Reset the graphical parameter to default
+par(mar=c(5, 4, 4, 2) + 0.1)
+```
+
+It is clear that the relative log-returns of the stocks are strongly(? WIP) correlated when they belong to the same country: the american stocks in our case are an example. It can be seen also that the relative log-returns of european stocks are correlated among them and with some american stocks, suggesting the hypothesis that the american market can partly influence the european one. The relative log-returns of the only two stocks from asian countries are correlated with no other stock, highlighting the degree of independence of their markets.
+
+### Bootstrap CIs for the Shapley Values
+WIP bla bla bla introduction
+```{r, echo=TRUE}
+# Bootstrap CIs for Shapley Values
+B = 10000 # Number of iterations for bootstrap
+n <- nrow(df)
+shap.B <- matrix(NA, nrow = B, ncol = ncol(df)) # Bootstrap B shapley values for each stock
+dimnames(shap.B) <- list(1:B, colnames(df)) # Rename columns
+omega <- 0.5 # Select the risk propensity
+set.seed(4545) # Set seed for reproducibility
+# Main loop - non-parametric bootstrap for Shapley Values
+for (b in 1:B){
+  idx <-  sample(1:n, replace = T)
+  cov_mat <- matrix(ifelse(edges, cov(df[idx,]), 0), nrow = 10, ncol = 10) # Create a covariance matrix, fixing the covariance to zero for variables not linked in the correlation graph - WIP
+  for (j in 1:10){
+    shap.B[b,j] <- mean(df[idx,j]) - omega*sum(cov_mat[j,]) # shapley formula, we use the sample mean as estimator of the expected value WIP and the adjacency matrix of the correlation graph to retrieve the covariance between the variables
+  }
+}
+
+# Calculate percentile CIs for the Shapley Values and store them in a matrix
+perc_int <- function(bootsamp, alpha){
+  lows <- c(rep(NA,ncol(bootsamp)))
+  ups <- c(rep(NA,ncol(bootsamp)))
+  for (j in 1:ncol(bootsamp)){
+    lows[j] <- unname(quantile(bootsamp[,j], alpha/2))
+    ups[j] <-  unname(quantile(bootsamp[,j], 1-alpha/2))
+  }
+  out <- matrix(c(lows,ups), ncol = 2)
+  dimnames(out) <- list(colnames(bootsamp), c('Lower Bound','Upper Bound'))
+  return(out)
+}
+
+shap_ci_perc <- perc_int(shap.B,0.05)
+
+# WIP - Prettify it
+knitr::kable(shap_ci_perc ,  caption = "Bootstrapped Confidence Intervals for the Shapley Value of each stock")
+```
+
+WIP - Write comment, test several values of omega and select alpha wisely. Also, check if the mean is ok to estimate the expected value of the log-returns
