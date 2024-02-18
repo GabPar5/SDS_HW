@@ -34,9 +34,9 @@ The initial idea is, given a **fixed ordering** of agents, to pay each one of th
 The Shapley Value removes the dependence on the agents ordering by **averaging over all possible orderings (or permutations) of the players.**  
 Some additional notation is needed to formally define the Shapley Value:
 
-1. $S_\pi(j)$ is the set of all predecessors of player $j$ in the permutation $\pi \in \Pi_{\mathcal{P}}$ (where $\Pi_{\mathcal{P}}$ is the set of all permutations of $\mathcal{P}$). It's defined as $S_\pi(j)= \{r \in \mathcal{P} \ \text{such that} \ \pi(r) < \pi(j)\}$.  
-2. **The marginal contribution** of an agent $j$ with respect to a permutation $\pi$ in a game $G = (\mathcal{P}, \nu)$ is $$\Delta_\pi^G(j) = \nu(S_\pi(j) \cup \{j\} ) - \nu(S_\pi(j))$$
-and measures how much the player $j$ increases the value of the coalition consisting of its predecessor in $\pi$.  
+1. $S_\pi(j)$ the set of all predecessors of player $j$ in $\pi$ defined as $S_\pi(j)= \{r \in \mathcal{P} \ \text{such tath} \ \pi(r) < \pi(j)\}$ where $\Pi_{\mathcal{P}}$ is the set of all permutations of $\mathcal{P}$ and $\pi$ is a specific permutation.  
+2. **The marginal contribution** of an agent $j$ with respect to a permutation $\pi$ in a game $G = (\mathcal{P}, \nu)$, that is $$\Delta_\pi^G(j) = \nu(S_\pi(j) \cup \{j\} ) - \nu(S_\pi(j))$$
+and measures how much player $j$ increases the value of the coalition consisting of its predecessor in $\pi$.  
 
 Now, we can define the **Shapley Value** $\psi^G(j)$ (for a game $G$ and a player $j$) as **the average marginal contribution of the player $j$**, where the average is taken **over all permutations** of the player set (assumed to be **all equally likely**):
 
@@ -54,13 +54,13 @@ It is shown that the Shapley Value is **the only payoff division scheme** that h
 
 In **simple games** (monotone and with characteristic function which only takes values 0 and 1), the Shapley Value measures the *power of the player*, the probability that it can influence the outcome of the game. To be more precise, it is the **probability that the player $j$ turns a losing coalition into a winning one.**  
 
-The last important concept to stress is that the **Shapley value** can be used to determine the importance of the variables (**covariates**) involved in a supervised learning problem. It casts the problem as a game where the **covariates are players** and the **measure of fit is the characteristic function.** **The value of a coalition of covariates is the negative expected squared difference between the actual and predicted outcomes.** The Shapley value represents the **average contribution of a covariate to the predictive accuracy across all possible combinations of covariates.**   
+The last important concept to stress is that the **Shaley value** can be used to determine the importance of different variables (**covariates**) in a supervised learning problem. It casts the problem as a game where the **covariates are players** and the **measure of fit is the characteristic function.** **The value of a coalition of covariates is the negative expected squared difference between the actual and predicted outcomes.** The Shapley value represents the **average contribution of a covariate to the predictive accuracy across all possible combinations of covariates.**   
 
-An important remark regarding the Shapley value is that while it offers a comprehensive importance measure, **it doesn't come without limitations**, such as being affected by covariate correlation.
+An important remark regarding the Shapley value is that while it offer a comprehensive importance measure, **it isn't without limitations**, such as being affected by covariate correlation.
 
 ## Exercise 1: Get a better understanding of Games and Shapley
 
-In this first exercise, given a game with 3 players, **Antwohnette (A), BadellPadel (B) and Chumbawamba (C)** we are asked to complete the definition of the **characteristic function game, $\nu$**, and then to calculate the **Shapley value**.  
+In this first exercise, given a game with 3 player, **Antwohnette (A), BadellPadel (B) and Chumbawamba (C)** we are asked to complete the definition of the **characteristic function game, $\nu$**, and then to calculate the **Shapley value**.  
 
 Taking into account the definition of the **characteristic function game $\nu$** above we can claim that:  
 
@@ -72,8 +72,8 @@ From the text of the exercise we know that:
 - $\nu(A)=\nu(B)=\nu(C)=0$    
 - $\nu(ABC)=4$    
 
-Now we have to find the other value of $\nu$ associated with the other combinations of our players, so we have to find $\nu(AB)$, $\nu(AC)$ and $\nu(BC)$.  
-Let's start with the definition of our $\nu(C)$, that is **the numbers of hours potentially saved by well organized coalition**. In order to get our values we have to find the time window in which each pair of players saves time by working together and thus we must numerically count the hours in which our players are dedicated to solving the homework at the same time. 
+Now we have to find the other value of $\nu$ associated with the others combinations of our players and so we have to find $\nu(AB)$, $\nu(AC)$ and $\nu(BC)$.  
+Let's start with the definition of our $\nu$ that is **the numbers of hours potentially saved by well organized coalition**, so in order to get our values we have to find the hours in which each pair of players saves time by working together and thus we must numerically count the hours in which our players are dedicated to solving the homework at the same time. 
 From the setup of the game we know that:  
 
 - **Player A works from 14:00 to 17:00**  
@@ -83,12 +83,12 @@ From the setup of the game we know that:
 An so we can claim that:  
 
 - $\nu(AB)=2$, because the hours in which both A and B are dedicated to solving the homework are exactly 2, from 14:00 to 16:00.   
-- $\nu(AC)=0$, because A and C never have hours in common to work together on the homework and thus to 'team up'.  
+- $\nu(AC)=0$, because Because A and C never have hours in common to work together on the homework and thus 'team up'.  
 - $\nu(BC)=2$, because the hours in which both A and B are dedicated to solving the homework are exactly 2, from 11:00 to 13:00.  
 
-We have thus completed the definition of $\nu$ and we can proceed to calculate the **Shapley value**.  We have $\mathcal{P}=\{A,B,C\}$: the number of the permutations of a set of 3 elements is $3!=6$.  
-Due to this we have to analyze the following $6$ permutations: $$\Pi_\mathcal{P}=\{(A,B,C), (A,C,B), (B,A,C), (B,C,A), (C,A,B), (C,B,A)\}$$ 
-In order to get $\Delta_\pi^G(j) = \nu(S_\pi(j) \cup \{j\} ) - \nu(S_\pi(j))$ we have to analyze each permutation at time:
+We have thus completed the definition of $\nu$ and we can proceed to calculate the **Shaplay value**.  We have $\mathcal{P}=\{A,B,C\}$ and the number of the permutation of a set of 3 elements that is $3!=6$.  
+Due to this we have to analyze $6$ permutations, let's denote $\Pi_\mathcal{P}$ the set of all permutations of $\mathcal{P}$ and with this notation we have to focus on: $$\Pi_\mathcal{P}=\{(A,B,C), (A,C,B), (B,A,C), (B,C,A), (C,A,B), (C,B,A)\}$$ 
+In order to get, $\Delta_\pi^G(j) = \nu(S_\pi(j) \cup \{j\} ) - \nu(S_\pi(j))$, that is the **marginal contribution** of each player calculated recurring to, $S_\pi(j)$, the set of all predecessors of player $j$, where $j \in \{A,B,C\}$, in each permutation, $\pi$, we have to analyze each permutation at time:
 
 - $(A,B,C):$ 
     - $\Delta_\pi^G(A) = \nu(S_\pi(A) \cup \{A\} ) - \nu(S_\pi(A))= \nu(\emptyset \cup \{A\} ) - \nu(\emptyset) = \nu(A) - \nu(\emptyset)=0$   
@@ -99,7 +99,7 @@ In order to get $\Delta_\pi^G(j) = \nu(S_\pi(j) \cup \{j\} ) - \nu(S_\pi(j))$ we
     Because the calculation here is the same of the the previous step because the $A$ is in the same position in the permutation so its **marginal contribution** is the same.
     - $\Delta_\pi^G(C) = \nu(S_\pi(C) \cup \{C\} ) - \nu(S_\pi(C))= \nu(\{A\} \cup \{C\} ) - \nu(A) = \nu(AC) - \nu(A)=0-0=0$  
     - $\Delta_\pi^G(B) = 4$  
-    We can claim this because $\sum_{j\in \pi}\Delta_\pi^G(j)=\nu(A,B,C)=4$ so since we know that $\Delta_\pi^G(A) = 0$ and $\Delta_\pi^G(C) =0$ definitely $\Delta_\pi^G(B) = 4.$  
+    We can claim this because $\sum_{j\in \pi}\Delta_\pi^G(j)=\nu(A,B,C)=4$ so since we know that $\Delta_\pi^G(A) = 4$ and $\Delta_\pi^G(C) =0$ definitely $\Delta_\pi^G(B) = 4.$  
 - $(B,A,C):$
     - $\Delta_\pi^G(B) = \nu(S_\pi(B) \cup \{B\} ) - \nu(S_\pi(B))=\nu(\emptyset \cup \{B\} ) - \nu(\emptyset) = \nu(B) - \nu(\emptyset)=0-0=0$  
     - $\Delta_\pi^G(A) = \nu(S_\pi(A) \cup \{A\} ) - \nu(S_\pi(A))=\nu(\{B\} \cup \{A\} ) - \nu(B)= \nu(AB) - \nu(B)=2-0=2$  
@@ -118,7 +118,7 @@ In order to get $\Delta_\pi^G(j) = \nu(S_\pi(j) \cup \{j\} ) - \nu(S_\pi(j))$ we
     Here again the result it is this due to the fact that $\sum_{j\in \pi}\Delta_\pi^G(j)=\nu(A,B,C)=4.$
 - $(C,B,A):$  
     - $\Delta_\pi^G(C) = 0$  
-    Because the calculation here is the same of the the previous step because the $C$ is in the same position in the permutation so its **marginal contribution** is the same. 
+    Because the calculation here is the same of the the previous step because the $B$ is in the same position in the permutation so its **marginal contribution** is the same. 
     - $\Delta_\pi^G(B) = \nu(S_\pi(B) \cup \{B\} ) - \nu(S_\pi(B))=\nu(\{C\} \cup \{B\} ) - \nu(C) = \nu(BC) - \nu(C)=2-0=2$
     - $\Delta_\pi^G(A) = 2$  
     Here again the result it is this due to the fact that $\sum_{j\in \pi}\Delta_\pi^G(j)=\nu(A,B,C)=4.$  
@@ -138,16 +138,17 @@ CBA & 2 & 2 & 0 \\ \hline
 \end{array}
 \]
 
-At this point, we have everything to calculate the **Shapley value**. First of all, remember that the **Shapley value** of each player $j$ (where $j \in \{A,B,C\}$ in our case) is the function that calculates the average marginal contribution of each players, taken over all permutations of the player-set, in particular we have: $$\psi^G(j)=\mathbb{E}[\Delta_\pi^G(j)]=\frac{1}{p!}\sum_{\pi \in \Pi_\mathcal{P}} \Delta_\pi^G(j)$$ 
-In our scenario we have $3!=6$ permutations and for each player we have:  
+At this point, we have everything to calculate the **Shapley value**. First of all, remember that the **Shapley value** of each player $j$, where $j \in \{A,B,C\}$ is the function that calculates the average marginal contribution of each players, taken over all permutations of the player-set, in particular we have: $$\psi^G(j)=\mathbb{E}[\Delta_\pi^G(j)]=\frac{1}{p!}\sum_{\pi \in \Pi_\mathcal{P}} \Delta_\pi^G(j)$$ 
+In our scenario we have $p!=3!=6$ permutations and for each player we have:  
 - **Player A:** $\sum_{\pi \in \Pi_\mathcal{P}} \Delta_\pi^G(A)=6$  
 - **Player B:** $\sum_{\pi \in \Pi_\mathcal{P}} \Delta_\pi^G(B)=12$    
 - **Player C:** $\sum_{\pi \in \Pi_\mathcal{P}} \Delta_\pi^G(C)=6$  
+
 So in the end we can claim that:  
 $$\psi^G(A)=\frac{6}{6}=1 \\ \psi^G(B)=\frac{12}{6}=2 \\ \psi^G(C)=\frac{6}{6}=1$$ 
-**Interpreting this value in the given context suggests us that Antwohnette and Chumbawamba can potentially save 1 hour by forming a well organized coalition, while BadellPadel can save 2 hours.**
+**If we read this value in the context of the exercise they suggest to us that Antwohnette and Chumbawamba have potentially saved 1 hour by well organized coalition, instead BadellPadel 2 hours.**
 
-## Exercise 2: WIP
+## Exercise 2: A statistical application of the Shapley value to finance
 In this exercise it is asked to leverage the theory above in a financial context. There is a **portfolio of $p$ stocks** whose returns are modeled by a set of random variables $\{X_1,...,X_p\}$. The **utility function** is defined as follows:
 \begin{align}
 U_{\omega}(X) = \mathbb{E}(X) - \omega\cdot\mathbb{V}ar(X) \quad \text{for some weight} \quad \omega > 0
@@ -155,9 +156,9 @@ U_{\omega}(X) = \mathbb{E}(X) - \omega\cdot\mathbb{V}ar(X) \quad \text{for some 
 It's basically a linear combination of the average return and volatility of the portfolio. The problem consists in deciding how to allocate the capital among all of the stocks: intuitively, it would be good that the allocation is proportional to the asset's contribution to the total utility $U_{\omega}(\sum_{j=1}^pX_j)$.  
 We now define this setting in a **cooperative game theory prespective**. Let the assets be the players and let $C$ be any coalition of them, with $R_C = \sum_{j\in C}X_j$ being their return. For any $C\subset\mathcal{P}$ we define the characteristic function as follows:
 \begin{align}
-\mathcal{v}(C) = U_{\omega}(R_C) = \mathbb{E}(R_C) - \omega\cdot\mathbb{V}ar(R_C) = \mathcal{v}_{\mathbb{E}}(C) - \omega\cdot\mathcal{v}_{\mathbb{V}}(C)
+\nu(C) = U_{\omega}(R_C) = \mathbb{E}(R_C) - \omega\cdot\mathbb{V}ar(R_C) = \nu_{\mathbb{E}}(C) - \omega\cdot\nu_{\mathbb{V}}(C)
 \end{align}
-Hence, the game we're defining $(G = (\mathcal{P},\mathcal{v}))$ is a linear combination of two other games: $G_{\mathbb{E}} = (\mathcal{P},\mathcal{v}_{\mathbb{E}})$ and $G_{\mathbb{V}} = (\mathcal{P},\mathcal{v}_{\mathbb{V}})$.  
+Hence, the game we're defining $(G = (\mathcal{P},\nu))$ is a linear combination of two other games: $G_{\mathbb{E}} = (\mathcal{P},\nu_{\mathbb{E}})$ and $G_{\mathbb{V}} = (\mathcal{P},\nu_{\mathbb{V}})$.  
 Since our goal is to allocate the capital proportionally to the contribution given to the total utility, the Shapley Value turns out to be suitable and simple.  
 By the **additivity of the Shapley Value** we get that:
 \begin{align}
@@ -179,31 +180,44 @@ In other words, the **Shapley Value used to allocate capital is a population qua
 In practice, we need to:  
 
 - Select a sensibly sized portfolio of $p$ stocks and take their *closing price* from **January 1, 2020 till the end of 2023.**
-- From the closing prices $c_{t,j}$ (stock $j$ on day $t$), we have to **compute their relative variation** WIP $x_{t,j} = \log(c_{t,j}/c_{t-1,j})$.
-- By seeing each stock as a node, we have to **estimate the Pearson-based correlation graph over stocks**, by treating the instances $\{x_{t,j}\}_t$ as independent samples (even though they're not). We place an undirected edge between stocks $j1$ and $j2$ only if their estimated Pearson correlation is large enough (statistically significative or over a threshold $\tau > 0$). Beware of multiplicity when choosing the threshold! 
+- From the closing prices $c_{t,j}$ (stock $j$ on day $t$), we have to **compute their relative variation** $x_{t,j} = \log(c_{t,j}/c_{t-1,j})$.
+- By seeing each stock as a node, we have to **estimate the Pearson-based correlation graph over stocks**, by treating the instances $\{x_{t,j}\}_t$ as independent samples (even though they're not). We place an undirected edge between stocks $j_1$ and $j_2$ only if their estimated Pearson correlation is large enough (statistically significative or over a threshold $\tau > 0$). Beware of multiplicity when choosing the threshold! 
 - After **properly visualizing the graph**, we have to draw some conclusions based on the decisions made along the way.
-- Finally, we have to **provide and visualize bootstrapped confidence intervals for the Shapley Values** of the stocks in our portfolio and comment the results based on the choices we've made.
+- Finally, we have to **provide and visualize bootstrapped confidence intervals for the Shapley Values** of the stocks in our portfolio and comment the results based on the choices we've made.  
 
-Energy, Information Technology, health care, Consumer Discrectionary, Financials. Due per settore
+As we said, the first important thing is to get the data and in particular we have decided to select from the **Global Industry Classification Standard (GICS)** sectors **10 stocks**, picking a pair of stock for each of the following sectors: **Energy, Information Technology, Consumer Discrectionary, Healthcare and Financials.** The stocks selected are the following:  
 
-- ENI (ITALY)
-- SUMISEKI HOLDINGS (JAPAN)
-- APPLE (USA)
-- MICROSOFT (USA)
-- MC DONALDS (USA)
-- CARREFOUR (FRANCIA)
-- BAYER (GERMANIA)
-- CIPLA (INDIA)
-- BLACKROCK (USA)
-- JP MORGAN (USA)
+- **Eni:** it is an italian multinational oil and gas company, headquartered in Rome, involved in oil and natural gas exploration, field development, production, as well as in the supply, trading, and shipping of natural gas, LNG, electricity, and fuels.  
+
+- **Sumiseki Holdings:** it is a japanese company primarily engaged in the coal and carbon-related business, including the production and sale of charcoal and other carbon products, with a focus on environmental sustainability and energy efficiency.  
+
+- **Apple:** it is an american multinational technology company headquartered in Cupertino, California, that designs, manufactures, and markets consumer electronics, computer software, and online services, best known for products like the iPhone, iPad, and Mac computers.  
+
+- **Microsoft:** it is an american multinational technology company that develops, manufactures, licenses, supports, and sells computer software, consumer electronics, and personal computers and services, notably the Windows operating systems, the Microsoft Office suite, and the Xbox gaming consoles.  
+
+- **McDonalds:** it is one of the most famous fast food company. It is the world's largest restaurant chain by revenue, serving over 69 million customers daily in over 100 countries across 37,855 outlets as of 2018.
+
+- **Carrefour:** it is a french multinational retail corporation that is one of the largest hypermarket chains in the world, operating a chain of hypermarkets, groceries and convenience stores, which as of 2020, operates in more than 30 countries.  
+
+- **Bayer:** it is a German multinational pharmaceutical and life sciences company and one of the largest pharmaceutical companies in the world, its areas of business include human and veterinary pharmaceuticals, agricultural chemicals, seeds, and biotechnology products.
+
+- **Cipla:** it is an indian multinational pharmaceutical and biotechnology company that primarily develops medicines to treat respiratory, cardiovascular disease, arthritis, diabetes, weight control, depression and other medical conditions.  
+
+- **BlackRock:** it is an american global investment management corporation based in New York City. Founded in 1988, initially as a risk management and fixed income institutional asset manager, BlackRock is the world's largest asset manager, with $8.67 trillion in assets under management as of January 2021.  
+
+- **JPMorgan:** it is an american multinational investment bank and financial services holding company, it is the largest bank in the United States, and the world's by total assets, considered to be a major provider of financial services, and according to Forbes magazine is the world's most valuable bank by market capitalization.  
+
+**We decided to choose 2 stocks for each sector and 5 different sectors precisely in order to diversify the choice** so that we could compare stocks in the same sector but especially the correlation that may exist between stocks in different sectors, trying to understand why there is a correlation and thus interpret the data we get. In addition to diversification by different sectors, we also decided to diversify according to the country where these stocks are based (we have 3 European stocks, 5 American stocks and 2 Asian stocks) so that we could also understand whether the country affects the correlation.  
+
+Once chosen the stocks to work with, we'll get the data of open and close prize from the **January 1, 2020 till the end of 2023.**
+We had to do a bit of preprocessing to have a great set of data to work with because we realised that we had *different length series, the opening days of some stocks different from the others, so we decided to fill eventual holidays to prevent this from happening* and once we had consistent data we calculated the **log-returns for each stock.**
 
 
-
-WIP - DESCRIBE THE STOCKS CHOSEN AND THE LABELS ASSIGNED
 ```{r, echo=TRUE}
 # PREPROCESSING PART 1
 # Get stocks data with the library 'tseries'
-suppressPackageStartupMessages(library(tseries, quietly=T))
+library(tseries, quietly = T)
+options("getSymbols.warning4.0" = FALSE)
 
 # Let's pull data about the chosen stocks
 eni <- get.hist.quote(instrument="E", start="2020-01-01", end="2023-12-31", quote= c("Open","Close"), provider="yahoo", drop=TRUE, quiet = TRUE)
@@ -251,11 +265,29 @@ brk$y = diff(log(brk$Close))
 jpm$y = diff(log(jpm$Close))
 ```
 
+We have thus obtained the necessary data for our analysis and to better understand them it is necessary to comment them with some basic plots:
+
 ```{r, echo=FALSE, fig.width=10, fig.height=8, fig.align='center', out.width = '200%', out.height = '400%', dpi = 300}
 # Now, let's visualize the closing prices of the chosen stocks along with their relative log-returns
 plot(cbind(eni$Close,smh$Close,aapl$Close,micro$Close,mcd$Close,carf$Close,bay$Close,cipla$Close,brk$Close,jpm$Close), main = 'Stocks closing prices', xlab = 'Date', ylab = c('ENI','SMH','AAPL','MICRO','MCD','CARF','BAY','CIPLA','BRK','JPM'), cex.main = 2)
 plot(cbind(eni$y,smh$y,aapl$y,micro$y,mcd$y,carf$y,bay$y,cipla$y,brk$y,jpm$y), main = 'Stocks relative log-returns', xlab = 'Date', ylab = c('ENI','SMH','AAPL','MICRO','MCD','CARF','BAY','CIPLA','BRK','JPM'), cex.main = 2)
 ```
+
+The plots above show the closing prices of the chosen stocks along with their relative log-returns and as we can see this dual perspective allows us to dissect both the overall trend of the stock prices and the daily percentage changes which provide insights into the stocks' volatility and potential risk for investors, indeed the closing price plots display a rich tapestry of market behaviors: Eni and Carrefour exhibit moderate, steady upward trends, suggesting reliable growth with periods of consolidation. Sumiseki Holdings' pronounced surge, especially towards the latest dates, could indicate a market re-rating or reaction to positive industry developments. Apple and Microsoft's stocks show resilience with recovery from mid-2021 onwards, possibly reflecting successful adaptation to market conditions or strong financial performance.  
+
+Conversely, Bayer and Cipla show downtrends, reflecting potential sectoral challenges or company-specific issues. BlackRock's plot presents a more volatile journey with a recent uptick, hinting at possible strategic shifts or market re-assessment and JPMorgan's stock reveals a pattern of decline followed by recovery, perhaps mirroring the broader financial sector's response to economic cycles.  
+
+Turning to the relative log-returns, we see that while Eni and Carrefour maintain a relatively stable volatility profile, stocks like Sumiseki Holdings, Microsoft, and JPMorgan have periods with spikes in returns, indicating episodes of high volatility. These may correlate with market events or company-specific news that caused sudden investor reactions. BlackRock, despite its recovery in price, shows consistently higher volatility in returns, suggesting it may carry a higher risk profile.  
+
+The visual spread of log-returns for Bayer and Cipla is narrower, yet the downtrend in their prices could imply deteriorating investor confidence or fundamental issues within these companies. McDonald's log-returns suggest a stable investment with lower risk but also lower returns, which could be appealing for risk-averse investors.  
+
+In conclusion we can claim that the distinct patterns observed across these stocks point towards a heterogeneous impact of macroeconomic conditions and sector specific events over the past four years. We can also see a pattern reflected in all stocks, which is the large variation in log-returns during the months of the global Covid-19 pandemic that greatly affected the economy.    Considering, instead, the other years, While some stocks have thrived, possibly due to innovation, strategic positioning, or favorable market conditions, others have faced declines that could be attributable to adverse sectoral developments or operational headwinds, for istance in the case of Apple and Microsoft we can observe a truly remarkable increase in closing prices from 2020 to the present day, which is also probably attributable to the post-pandemic onset of even higher consumption of technological equipment, both personally and at work/school.
+
+The next step for our analysis is to obtain the Pearson correlations of each stock compared to each other and in order to get these values we decided to proceed as follows:
+- The data we obtained from the first part of preprocessing gave us the opening date as 01-07-2020, however, once the log-returns were calculated, given that the latter provide us with the change in the closing price of the same day compared to the previous day, we had missing data which was the log-return of the day 01-07-2020 and therefore we decided to create a dataframe that was structured as follows: on the columns they had each stock and instead on the rows the log-returns for each day from 01-08-2020 to 12-29-2023
+- Once we obtained the dataframe we built the correlation matrix where on the rows and columns we have the stocks in such a way that in position $(i,j)$ of the matrix there is the correlation coefficient between the stock present in row $i$ and the stock in column $j$
+
+The following is the correlation matrix we had:
 
 ```{r, echo=TRUE}
 # PREPROCESSING PART 2
@@ -286,14 +318,44 @@ jpm$dates <- rownames(jpm)
 df <- plyr::join_all(list(eni,smh,aapl,micro,mcd,carf,bay,cipla,brk,jpm), by = 'dates', type = 'full')
 df <- subset(df, select = -c(dates))
 colnames(df) <- c('eni','smh','aapl','micro','mcd','carf','bay','cipla','brk','jpm')
+
+# Print the correlation matrix between stocks
+corr_mat <- cor(df)
+# WIP - Prettify it
+knitr::kable(corr_mat ,  caption = "Correlation Matrix")
 ```
 
-Now we have to build the marginal correlation graph (thus to choose the threshold)... WIP
-```{r, echo=TRUE}
-# CHOOSING THE THRESHOLD
-# Calculate the correlation matrix between the relative log-returns of the stocks
-corr_mat <- cor(df)
+From the matrix there are some key observations that we have to do:  
 
+As expected, companies within the same sector show strong correlations in their stock returns, for instance Apple and Microsoft, both in the technology sector, have a high correlation (0.779), suggesting their stock prices often move in tandem, possibly due to similar market influences or technological developments impacting the sector.  
+
+On the other hand, JPMorgan has notable correlations with companies across different sectors, such as Eni (0.633), indicating that macroeconomic factors or global market sentiments might have a significant influence on these stocks. This could be due to JPMorgan's broad exposure to various industries through its financial services.  
+If we focus our attention on the energy sector, in particular on Eni, and financial services, represented by JPMorgan and BlackRock, show a moderate to high correlation (Eni and JPM: 0.633, Eni and BRK: 0.521) and this may reflect the sensitivity of financial stocks to changes in energy prices, which can impact economic growth and inflation, thereby influencing financial markets.  
+
+Instead, analyzing the healthcare sector Bayer shows moderate correlations with most stocks, but Cipla shows relatively low correlations with the rest, especially with Sumiseki Holdings and McDonald's. This could indicate that Cipla's stock is more influenced by sector specific or regional factors, as the healthcare industry can be quite diverse and influenced by different regulatory environments.  
+
+Carrefour shows lower correlations with technology and materials stocks, which aligns with the defensive nature of consumer staples during various market conditions. On the other hand, McDonald's (consumer discretionary) has higher correlations with tech stocks, possibly due to shared consumer spending patterns and economic growth prospects.  
+
+Sumiseki Holdings has a very low correlation with most stocks, particularly with those outside its sector, like Cipla and Carrefour. This could be attributed to the materials sector's unique dependence on commodity prices and industrial demand, as opposed to consumer or healthcare markets.  
+
+If we look at whole correlations the varying degrees of correlation indicate potential for risk diversification, for instance, an investor might combine holdings in Cipla with any of the tech companies to create a portfolio that is less prone to market volatility, as indicated by the relatively low correlations.  
+
+In conclusion from the matrix we can state that the correlation matrix reflects both sectoral influences and broader economic factors at play. It highlights potential risk diversification strategies and underscores the importance of understanding both sector specific and macroeconomic factors when analyzing stock correlations and this correlation matrix **is crucial for constructing portfolios that can potentially mitigate risk through diversification while capitalizing on correlated movements within certain industries.**  
+
+At this point we are able to getting started building the **Pearson-based correlation graph over stocks.**  
+
+We need two fundamental ingredient to build it:  
+
+- **$\tau$, a specific and appropriate threshold:**a common approach is to select $\tau$ based on statistical significance, ensuring that correlations considered are not due to chance because for financial data a stricter threshold might be chosen to focus on more robust correlations, so given this emphasis on statistical significance and the avoidance of multiplicity issues (as we studied in class), it's crucial to balance the desire for identifying meaningful correlations with the risk of falsely identifying random relationships as significant. A conservative approach might involve setting $\tau$ at a level where the false discovery rate is controlled, possibly through adjustment methods like the Bonferroni correction due to multiple comparisons made. In particular we chose to follow these steps:    
+    - Given the matrix correlation for each correlation coefficient we calculated the p-value to assess its statistical significance.  
+    - **Apply the Bonferroni correction** in order to control the FDR due to multiple comparisons. The Bonferroni correction is based on adjusting the significance level $\alpha$ by dividing it by the number of comparisons, so in particular in our scenario we have $m=45$ comparisons (a Pearson correlation for each combination of 2 stock in a group of 10 stock) and in order to maintain an overall significance level of $\alpha$ we used $\alpha^\prime=\frac{\alpha}{m}$ as our new significance level for each individual test (supposing each correlation as a test).  
+   - Finally, based on the corrected p-values, we chose **$\tau$ as the threshold above which we consider correlation coefficients to be significant, so we choose $\tau$ based on the smallest p-value that is considered significant after the correction.**     
+- **$C^{j_1,j_2}_n(\alpha)$:** the usual asymptotic Normal-based confidence interval at level $\alpha=0.05$ for the Pearson-correlation studied during the lessons.  
+
+
+Having collected these two fundamental ingredients, we now construct the graph in the following way: **we will add an edge connecting two stocks if the associated Pearson's correlation confidence interval ($C^{j_1,j_2}_n(\alpha)$)doesn't intersect a symmetric interval $[-\tau,\tau]$.**  
+
+```{r, echo=TRUE}
 # We will add an edge connecting two stocks if the associated Pearson's correlation Confidence Interval doesn't intersect a symmetric interval [-tau,tau]. We've decided that tau is the lowest statistically significant Pearson's correlation coefficient overall. Since we need to understand the *global* topology of the graph, the statistical significance must be asserted by correcting the level with Bonferroni method.
 
 # In our case there are m=45 different Pearson's correlation coefficients
