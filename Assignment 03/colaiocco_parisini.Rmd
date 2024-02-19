@@ -176,16 +176,16 @@ In conclusion, after picking a suitable weight $\omega > 0$, the Shapley allocat
 \begin{align}
 \psi^G(j) = \mathbb{E}(X_j) - \omega\cdot\mathbb{C}ov(X_j,R_{\mathcal{P}}) = \mathbb{E}(X_j) - \omega\cdot\sum_{r=1}^p\mathbb{C}ov(X_j,X_r)
 \end{align}
-In other words, the **Shapley Value used to allocate capital is a population quantity to be estimated**. By taking a look at the formula, it can be notices that we would need to study the marginal correlation graph among some standard measure of stock *relative performance* (which may be calculated starting from the *daily closing prices* of the stocks).  
+In other words, the **Shapley Value, used to allocate capital, is a population quantity to be estimated**. By taking a look at the formula, it can be noticed that we would need to study the marginal correlation graph among some standard measure of stock *relative performance* (which may be calculated starting from the *daily closing prices* of the stocks).  
 In practice, we need to:  
 
 - Select a sensibly sized portfolio of $p$ stocks and take their *closing price* from **January 1, 2020 till the end of 2023.**
-- From the closing prices $c_{t,j}$ (stock $j$ on day $t$), we have to **compute their relative variation** $x_{t,j} = \log(c_{t,j}/c_{t-1,j})$.
-- By seeing each stock as a node, we have to **estimate the Pearson-based correlation graph over stocks**, by treating the instances $\{x_{t,j}\}_t$ as independent samples (even though they're not). We place an undirected edge between stocks $j_1$ and $j_2$ only if their estimated Pearson correlation is large enough (statistically significative or over a threshold $\tau > 0$). Beware of multiplicity when choosing the threshold! 
+- From the closing prices $c_{t,j}$ (stock $j$ on day $t$), we have to **compute their relative log-returns** $x_{t,j} = \log(c_{t,j}/c_{t-1,j})$.
+- By setting each stock as a node, we have to **estimate the Pearson-based correlation graph over stocks**, by treating the instances $\{x_{t,j}\}_t$ as independent samples (even though they're not). We place an undirected edge between stocks $j_1$ and $j_2$ only if the CI for the Pearson correlation doesn't intersect the interval $[-\tau,\tau]$, where $\tau$ is an arbitrary threshold.
 - After **properly visualizing the graph**, we have to draw some conclusions based on the decisions made along the way.
-- Finally, we have to **provide and visualize bootstrapped confidence intervals for the Shapley Values** of the stocks in our portfolio and comment the results based on the choices we've made.  
+- Finally, we have to **provide bootstrapped confidence intervals for the Shapley Values** of the stocks in our portfolio and comment the results based on the choices we've made.  
 
-As we said, the first important thing is to get the data and in particular we have decided to select from the **Global Industry Classification Standard (GICS)** sectors **10 stocks**, picking a pair of stock for each of the following sectors: **Energy, Information Technology, Consumer Discrectionary, Healthcare and Financials.** The stocks selected are the following:  
+As we said, the first important thing is to get the data: we have decided to select from the **Global Industry Classification Standard (GICS)** sectors **10 stocks**, picking a pair of stock for each of the following sectors: **Energy, Information Technology, Consumer Discrectionary, Healthcare and Financials.** The selected stocks are the following:  
 
 - **Eni:** it is an italian multinational oil and gas company, headquartered in Rome, involved in oil and natural gas exploration, field development, production, as well as in the supply, trading, and shipping of natural gas, LNG, electricity, and fuels.  
 
@@ -197,20 +197,20 @@ As we said, the first important thing is to get the data and in particular we ha
 
 - **McDonalds:** it is one of the most famous fast food company. It is the world's largest restaurant chain by revenue, serving over 69 million customers daily in over 100 countries across 37,855 outlets as of 2018.
 
-- **Carrefour:** it is a french multinational retail corporation that is one of the largest hypermarket chains in the world, operating a chain of hypermarkets, groceries and convenience stores, which as of 2020, operates in more than 30 countries.  
+- **Carrefour:** it is a french multinational retail corporation operating one of the largest chain of hypermarkets, groceries and convenience stores in the world. As of 2020, it operates in more than 30 countries.  
 
-- **Bayer:** it is a German multinational pharmaceutical and life sciences company and one of the largest pharmaceutical companies in the world, its areas of business include human and veterinary pharmaceuticals, agricultural chemicals, seeds, and biotechnology products.
+- **Bayer:** it is a german multinational pharmaceutical and life sciences company and one of the largest pharmaceutical companies in the world. Its areas of business include human and veterinary pharmaceuticals, agricultural chemicals, seeds, and biotechnology products.
 
 - **Cipla:** it is an indian multinational pharmaceutical and biotechnology company that primarily develops medicines to treat respiratory, cardiovascular disease, arthritis, diabetes, weight control, depression and other medical conditions.  
 
 - **BlackRock:** it is an american global investment management corporation based in New York City. Founded in 1988, initially as a risk management and fixed income institutional asset manager, BlackRock is the world's largest asset manager, with $8.67 trillion in assets under management as of January 2021.  
 
-- **JPMorgan:** it is an american multinational investment bank and financial services holding company, it is the largest bank in the United States, and the world's by total assets, considered to be a major provider of financial services, and according to Forbes magazine is the world's most valuable bank by market capitalization.  
+- **JPMorgan:** it is an american multinational investment bank and financial services holding company, it is the largest bank in the United States, and the world's by total assets, considered to be a major provider of financial services, and according to Forbes magazine it is the world's most valuable bank by market capitalization.  
 
-**We decided to choose 2 stocks for each sector and 5 different sectors precisely in order to diversify the choice** so that we could compare stocks in the same sector but especially the correlation that may exist between stocks in different sectors, trying to understand why there is a correlation and thus interpret the data we get. In addition to diversification by different sectors, we also decided to diversify according to the country where these stocks are based (we have 3 European stocks, 5 American stocks and 2 Asian stocks) so that we could also understand whether the country affects the correlation.  
+**We've decided to choose 2 stocks from 5 different sectors to diversify the portfolio**, so that we could compare stocks in the same sector but especially the correlation that may exist between stocks in different sectors, trying to understand why there is a correlation and thus interpret the data we get. In addition to diversification by different sectors, we also decided to diversify according to the country where these stocks are based (we have 3 European stocks, 5 American stocks and 2 Asian stocks), so that we could also understand whether the geographical position affects the relationship between the stocks.  
 
-Once chosen the stocks to work with, we'll get the data of open and close prize from the **January 1, 2020 till the end of 2023.**
-We had to do a bit of preprocessing to have a great set of data to work with because we realised that we had *different length series, the opening days of some stocks different from the others, so we decided to fill eventual holidays to prevent this from happening* and once we had consistent data we calculated the **log-returns for each stock.**
+Once we've chosen the stocks to work with, we got the data of open and close prize from the **January 1, 2020 till the end of 2023.**
+We had to do a bit of preprocessing to have a set of data to work with because we've realized that we had *different length series, as the opening days of some stocks were different from the others. We've decided to fill eventual holidays to prevent this from happening* and once we had consistent data we've calculated the **realtive log-returns for each stock.**
 
 
 ```{r, echo=TRUE}
@@ -219,7 +219,7 @@ We had to do a bit of preprocessing to have a great set of data to work with bec
 library(tseries, quietly = T)
 options("getSymbols.warning4.0" = FALSE)
 
-# Let's pull data about the chosen stocks
+# Pull data about the chosen stocks
 eni <- get.hist.quote(instrument="E", start="2020-01-01", end="2023-12-31", quote= c("Open","Close"), provider="yahoo", drop=TRUE, quiet = TRUE)
 
 smh <- get.hist.quote(instrument="1514.T", start="2020-01-01", end="2023-12-31", quote= c("Open","Close"), provider="yahoo", drop=TRUE, quiet = TRUE)
@@ -240,7 +240,7 @@ brk <- get.hist.quote(instrument="BLK", start="2020-01-01", end="2023-12-31", qu
 
 jpm <- get.hist.quote(instrument="JPM", start="2020-01-01", end="2023-12-31", quote= c("Open","Close"), provider="yahoo", drop=TRUE, quiet = TRUE)
 
-# Fill eventual holidays to prevent different series' length
+# Fill eventual missing dates (probably holidays) to prevent different series' length
 eni <- zoo::na.approx(eni, xout = seq(start(smh), end(eni), by = "day"), method = "constant")
 smh <- zoo::na.approx(smh, xout = seq(start(smh), end(smh), by = "day"), method = "constant")
 aapl <- zoo::na.approx(aapl, xout = seq(start(smh), end(aapl), by = "day"), method = "constant")
@@ -265,7 +265,7 @@ brk$y = diff(log(brk$Close))
 jpm$y = diff(log(jpm$Close))
 ```
 
-We have thus obtained the necessary data for our analysis and to better understand them it is necessary to comment them with some basic plots:
+We have thus obtained the necessary data for our analysis. To better understand the data, it is necessary to visualize it with some basic plots:
 
 ```{r, echo=FALSE, fig.width=10, fig.height=8, fig.align='center', out.width = '200%', out.height = '400%', dpi = 300}
 # Now, let's visualize the closing prices of the chosen stocks along with their relative log-returns
@@ -273,7 +273,7 @@ plot(cbind(eni$Close,smh$Close,aapl$Close,micro$Close,mcd$Close,carf$Close,bay$C
 plot(cbind(eni$y,smh$y,aapl$y,micro$y,mcd$y,carf$y,bay$y,cipla$y,brk$y,jpm$y), main = 'Stocks relative log-returns', xlab = 'Date', ylab = c('ENI','SMH','AAPL','MICRO','MCD','CARF','BAY','CIPLA','BRK','JPM'), cex.main = 2)
 ```
 
-The plots above show the closing prices of the chosen stocks along with their relative log-returns and as we can see this dual perspective allows us to dissect both the overall trend of the stock prices and the daily percentage changes which provide insights into the stocks' volatility and potential risk for investors, indeed the closing price plots display a rich tapestry of market behaviors: Eni and Carrefour exhibit moderate, steady upward trends, suggesting reliable growth with periods of consolidation. Sumiseki Holdings' pronounced surge, especially towards the latest dates, could indicate a market re-rating or reaction to positive industry developments. Apple and Microsoft's stocks show resilience with recovery from mid-2021 onwards, possibly reflecting successful adaptation to market conditions or strong financial performance.  
+The plots above show the closing prices of the chosen stocks along with their relative log-returns. As we can see this dual perspective allows us to dissect both the overall trend of the stock prices and the daily percentage changes which provide insights into the stocks' volatility and potential risk for investors. Indeed the closing price plots display a rich tapestry of market behaviors: Eni and Carrefour exhibit moderate, steady upward trends, suggesting reliable growth with periods of consolidation. Sumiseki Holdings' pronounced surge, especially towards the latest dates, could indicate a market re-rating or reaction to positive industry developments. Apple and Microsoft's stocks show resilience with recovery from mid-2021 onwards, possibly reflecting successful adaptation to market conditions or strong financial performance.  
 
 Conversely, Bayer and Cipla show downtrends, reflecting potential sectoral challenges or company-specific issues. BlackRock's plot presents a more volatile journey with a recent uptick, hinting at possible strategic shifts or market re-assessment and JPMorgan's stock reveals a pattern of decline followed by recovery, perhaps mirroring the broader financial sector's response to economic cycles.  
 
@@ -281,15 +281,16 @@ Turning to the relative log-returns, we see that while Eni and Carrefour maintai
 
 The visual spread of log-returns for Bayer and Cipla is narrower, yet the downtrend in their prices could imply deteriorating investor confidence or fundamental issues within these companies. McDonald's log-returns suggest a stable investment with lower risk but also lower returns, which could be appealing for risk-averse investors.  
 
-So far we have given a more sectoral interpretation, but if we focus on the countries where these stocks are based we can clearly see the very low correlation between the Asian stocks (Cipla and Sumiseki Holdings) compared to the others, probably indicating a clear sign of the little economic influence between Western and Eastern countries, on the other hand the five American stocks have a high correlation between them. This allows us to state that the country they belong to also influences the correlation by far. 
+So far we have given a more sectoral interpretation, but if we focus on the countries where these stocks are based we can clearly see the very low correlation between the Asian stocks (Cipla and Sumiseki Holdings) compared to the others, probably indicating a clear sign of the little economic influence between Western and Eastern countries, on the other hand the five American stocks have a high correlation between them. This allows us to state that the geographical position also influences the correlation. 
 
-In conclusion we can claim that the distinct patterns observed across these stocks point towards a heterogeneous impact of macroeconomic conditions and sector specific events over the past four years. We can also see a pattern reflected in all stocks, which is the large variation in log-returns during the months of the global Covid-19 pandemic that greatly affected the economy.    Considering, instead, the other years, While some stocks have thrived, possibly due to innovation, strategic positioning, or favorable market conditions, others have faced declines that could be attributable to adverse sectoral developments or operational headwinds, for istance in the case of Apple and Microsoft we can observe a truly remarkable increase in closing prices from 2020 to the present day, which is also probably attributable to the post-pandemic onset of even higher consumption of technological equipment, both personally and at work/school.
+In conclusion we can claim that the distinct patterns observed across these stocks point towards a heterogeneous impact of macroeconomic conditions and sector specific events over the past four years. We can also see a pattern reflected in all stocks, which is the large variation in log-returns during the months of the global Covid-19 pandemic that greatly affected the economy.  
+Considering, instead, the other years, while some stocks have thrived (possibly due to innovation, strategic positioning, or favorable market conditions) others have faced declines that could be attributable to adverse sectoral developments or operational headwinds. For instance in the case of Apple and Microsoft we can observe a truly remarkable increase in closing prices from 2020 to the present day, which is also probably attributable to the post-pandemic onset of even higher consumption of technological equipment, both at home and at work/school.
 
-The next step for our analysis is to obtain the Pearson correlations of each stock compared to each other and in order to get these values we decided to proceed as follows:
-- The data we obtained from the first part of preprocessing gave us the opening date as 01-07-2020, however, once the log-returns were calculated, given that the latter provide us with the change in the closing price of the same day compared to the previous day, we had missing data which was the log-return of the day 01-07-2020 and therefore we decided to create a dataframe that was structured as follows: on the columns they had each stock and instead on the rows the log-returns for each day from 01-08-2020 to 12-29-2023
-- Once we obtained the dataframe we built the correlation matrix where on the rows and columns we have the stocks in such a way that in position $(i,j)$ of the matrix there is the correlation coefficient between the stock present in row $i$ and the stock in column $j$
+The next step of our analysis is to calculate the Pearson correlations of each stock compared to each other. In order to get these values we've decided to proceed as follows:
+- The data we've obtained from the first part of preprocessing gave us the opening date as 01-07-2020. However once the log-returns were calculated, given that the latter provide us with the change in the closing price of the same day compared to the previous day, we had missing data which was the log-return of the day 01-07-2020 and therefore we've decided to store data in a dataframe that was structured as follows: on the columns they had each stock and instead on the rows the log-returns for each day from 01-08-2020 to 12-29-2023
+- Once we've obtained the dataframe we've built the correlation matrix where on the rows and columns we have the stocks in such a way that in position $(i,j)$ of the matrix there is the correlation coefficient between the stock present in row $i$ and the stock in column $j$
 
-The following is the correlation matrix we had:
+The following is the correlation matrix we've obtained:
 
 ```{r, echo=TRUE}
 # PREPROCESSING PART 2
@@ -327,40 +328,38 @@ corr_mat <- cor(df)
 knitr::kable(corr_mat ,  caption = "Correlation Matrix")
 ```
 
-From the matrix there are some key observations that we have to do:  
+There are some key observations that we have to do:  
 
 As expected, companies within the same sector show strong correlations in their stock returns, for instance Apple and Microsoft, both in the technology sector, have a high correlation (0.779), suggesting their stock prices often move in tandem, possibly due to similar market influences or technological developments impacting the sector.  
 
 On the other hand, JPMorgan has notable correlations with companies across different sectors, such as Eni (0.633), indicating that macroeconomic factors or global market sentiments might have a significant influence on these stocks. This could be due to JPMorgan's broad exposure to various industries through its financial services.  
-If we focus our attention on the energy sector, in particular on Eni, and financial services, represented by JPMorgan and BlackRock, show a moderate to high correlation (Eni and JPM: 0.633, Eni and BRK: 0.521) and this may reflect the sensitivity of financial stocks to changes in energy prices, which can impact economic growth and inflation, thereby influencing financial markets.  
+If we focus our attention on the energy sector, in particular on Eni, and financial services, represented by JPMorgan and BlackRock, we can see a moderate to high correlation (Eni and JPM: 0.633, Eni and BRK: 0.521): this may reflect the sensitivity of financial stocks to changes in energy prices, which can impact economic growth and inflation.  
 
-Instead, analyzing the healthcare sector Bayer shows moderate correlations with most stocks, but Cipla shows relatively low correlations with the rest, especially with Sumiseki Holdings and McDonald's. This could indicate that Cipla's stock is more influenced by sector specific or regional factors, as the healthcare industry can be quite diverse and influenced by different regulatory environments.  
+Instead, focusing on the healthcare sector: Bayer shows moderate correlations with most stocks and Cipla shows relatively low correlations with the rest, especially with Sumiseki Holdings and McDonald's. This could indicate that Cipla's stock is more influenced by sector specific or regional factors, as the healthcare industry can be quite diverse and influenced by different regulatory environments.  
 
 Carrefour shows lower correlations with technology and materials stocks, which aligns with the defensive nature of consumer staples during various market conditions. On the other hand, McDonald's (consumer discretionary) has higher correlations with tech stocks, possibly due to shared consumer spending patterns and economic growth prospects.  
 
 Sumiseki Holdings has a very low correlation with most stocks, particularly with those outside its sector, like Cipla and Carrefour. This could be attributed to the materials sector's unique dependence on commodity prices and industrial demand, as opposed to consumer or healthcare markets.  
 
-If we look at whole correlations the varying degrees of correlation indicate potential for risk diversification, for instance, an investor might combine holdings in Cipla with any of the tech companies to create a portfolio that is less prone to market volatility, as indicated by the relatively low correlations.  
+The varying degrees of correlation indicate potential for risk diversification. For instance, an investor might combine holdings in Cipla with any of the tech companies to create a portfolio that is less prone to market volatility, as indicated by the relatively low correlations.  
 
-In conclusion from the matrix we can state that the correlation matrix reflects both sectoral influences and broader economic factors at play. It highlights potential risk diversification strategies and underscores the importance of understanding both sector specific and macroeconomic factors when analyzing stock correlations and this correlation matrix **is crucial for constructing portfolios that can potentially mitigate risk through diversification while capitalizing on correlated movements within certain industries.**  
+In conclusion, from the correlation matrix we can state that it reflects both sectoral influences and broader economic factors at play. It **is crucial for constructing portfolios that can potentially mitigate risk through diversification while capitalizing on correlated movements within certain industries.**  
 
-At this point we are able to getting started building the **Pearson-based correlation graph over stocks.**  
+At this point we are able to getting started building the **Pearson-based correlation graph over stocks**, which will give us a better understanding of the global correlation structure.
 
 We need two fundamental ingredient to build it:  
 
-- **$\tau$, a specific and appropriate threshold:**a common approach is to select $\tau$ based on statistical significance, ensuring that correlations considered are not due to chance because for financial data a stricter threshold might be chosen to focus on more robust correlations, so given this emphasis on statistical significance and the avoidance of multiplicity issues (as we studied in class), it's crucial to balance the desire for identifying meaningful correlations with the risk of falsely identifying random relationships as significant. A conservative approach might involve setting $\tau$ at a level where the false discovery rate is controlled, possibly through adjustment methods like the Bonferroni correction due to multiple comparisons made. In particular we chose to follow these steps:    
-    - Given the matrix correlation for each correlation coefficient we calculated the p-value to assess its statistical significance.  
-    - **Apply the Bonferroni correction** in order to control the FDR due to multiple comparisons. The Bonferroni correction is based on adjusting the significance level $\alpha$ by dividing it by the number of comparisons, so in particular in our scenario we have $m=45$ comparisons (a Pearson correlation for each combination of 2 stock in a group of 10 stock) and in order to maintain an overall significance level of $\alpha$ we used $\alpha^\prime=\frac{\alpha}{m}$ as our new significance level for each individual test (supposing each correlation as a test).  
-   - Finally, based on the corrected p-values, we chose **$\tau$ as the threshold above which we consider correlation coefficients to be significant, so we choose $\tau$ based on the smallest p-value that is considered significant after the correction.**     
+- **$\tau$, a specific and appropriate threshold:** a common approach is to select $\tau$ based on statistical significance of the correlation coefficients, ensuring that they are not due to chance. For financial data a stricter threshold might be chosen to focus on more robust correlations. We also need to avoid any multiplicity issue, as we perform multiple comparisons for every stock: it's crucial to balance the desire to identify meaningful correlations with the risk of falsely identifying random relationships as significant. A conservative approach might involve setting $\tau$ at a level where the false discovery rate is controlled, possibly through adjustment methods like the **Bonferroni correction**. In particular, we've chosen to follow these steps:    
+    - Calculate the p-value for each correlation coefficient in the correlation matrix to assess their statistical significance.  
+    - **Apply the Bonferroni correction** in order to control the FDR due to multiple comparisons. The Bonferroni correction is based on adjusting the significance level $\alpha$ by dividing it by the number of comparisons $m$. In our scenario we have a significance level $\alpha=0.05$ and $m=45$ comparisons (a Pearson correlation for each combination of 2 stock in a group of 10 stock). In order to maintain an overall significance level of $\alpha$ we must consider $\alpha^\prime=\frac{\alpha}{m}$ as our new significance level for each individual test.  
+   - Finally, based on the corrected significance level $\alpha^\prime$ (so after the correction), we set **$\tau$ to be the smallest significant correlation coefficient.**     
 - **$C^{j_1,j_2}_n(\alpha)$:** the usual asymptotic Normal-based confidence interval at level $\alpha=0.05$ for the Pearson-correlation studied during the lessons.  
 
 
-Having collected these two fundamental ingredients, we now construct the graph in the following way: **we will add an edge connecting two stocks if the associated Pearson's correlation confidence interval ($C^{j_1,j_2}_n(\alpha)$)doesn't intersect a symmetric interval $[-\tau,\tau]$.**  
+Having collected these two fundamental ingredients, we now construct the graph in the following way: **we will add an edge connecting two stocks if the associated Pearson's correlation confidence interval ($C^{j_1,j_2}_n(\alpha)$) doesn't intersect the symmetric interval $[-\tau,\tau]$.**  
 
 ```{r, echo=TRUE}
-# We will add an edge connecting two stocks if the associated Pearson's correlation Confidence Interval doesn't intersect a symmetric interval [-tau,tau]. We've decided that tau is the lowest statistically significant Pearson's correlation coefficient overall. Since we need to understand the *global* topology of the graph, the statistical significance must be asserted by correcting the level with Bonferroni method.
-
-# In our case there are m=45 different Pearson's correlation coefficients
+# There are m=45 comparisons
 # Hence, starting from a level alpha=0.05, the (Bonferroni) corrected level is
 m = 45
 alpha = 0.05
@@ -378,9 +377,9 @@ cor.test.p <- function(x){
     return(pvals)
 }
 
-# Get a matrix containing the lower bounds of the Confidence Intervals for Pearson's correlation (at the corrected level) 
-cor.test.lower <- function(x){
-    LOW <- function(x, y) cor.test(x, y, conf.level = 1-alpha_corrected)[['conf.int']][1]
+# Get a matrix containing the lower bounds of the Confidence Intervals for Pearson's correlation at the chosen significance level 
+cor.test.lower <- function(x, conf){
+    LOW <- function(x, y) cor.test(x, y, conf.level = conf)[['conf.int']][1]
     lower_bounds <- outer(
       colnames(x), 
       colnames(x), 
@@ -390,9 +389,9 @@ cor.test.lower <- function(x){
     return(lower_bounds)
 }
 
-# Get a matrix containing the upper bounds of the Confidence Intervals for Pearson's correlation (at the corrected level)
-cor.test.upper <- function(x){
-    UP <- function(x, y) cor.test(x, y, conf.level = 1-alpha_corrected)[['conf.int']][2]
+# Get a matrix containing the upper bounds of the Confidence Intervals for Pearson's correlation at the chosen significance level 
+cor.test.upper <- function(x, conf){
+    UP <- function(x, y) cor.test(x, y, conf.level = conf)[['conf.int']][2]
     upper_bounds <- outer(
       colnames(x), 
       colnames(x), 
@@ -402,25 +401,22 @@ cor.test.upper <- function(x){
     return(upper_bounds)
 }
 
+# Leverage the previously defined functions to calculate the p-values and the CIs associated to the correlation coefficients
 pvals <- cor.test.p(df)
-lower_b <- cor.test.lower(df)
-upper_b <- cor.test.upper(df)
+lower_b <- cor.test.lower(df, conf = 1-alpha_corrected)
+upper_b <- cor.test.upper(df, conf = 1-alpha_corrected)
 
 # The threshold is the minimum correlation coefficient among the statistically significant ones
 tau <- min(corr_mat[which(pvals < alpha_corrected)])
 
-# The edges which are going to be added to the graph are those corresponding to a Pearson's correlation coefficient with a CI non intersecting the interval [-tau,tau]. By doing this selection maintaining the structure of the correlation matrix we build an adjacency matrix for the graph
+# The edges which are going to be added to the graph are those corresponding to a Pearson's correlation coefficient with a CI not intersecting the interval [-tau,tau]
 edges <- (upper_b < -tau | lower_b > tau)
-# Build the adjacency matrix with correlations as weights
+# Leverage the previous selection and the correlation matrix to build the adjacency matrix with correlations as weights
 adj_mat <- matrix(ifelse(edges, round(corr_mat,2), 0), nrow = 10, ncol = 10)
-
-#LA THRESHOLD È LA CORRELATION SIGNIFICATIVA PIÙ BASSA DI TUTTE - WIP
-
-# WIP - Prettify it
-knitr::kable(corr_mat ,  caption = "Correlation Matrix")
 ```
 
-Here is the graph obtained WIP
+Here follows the correlation graph we've just built. Consider that the nodes' size represents the strength of their correlation **overall** (sum of correlation coefficients) and the nodes' color represents their country:
+
 ```{r, echo=FALSE, fig.width=10, fig.height=8, fig.align='center', out.width = '200%', out.height = '400%', dpi = 300}
 # GRAPH VISUALIZATION
 # Import igraph library and use it to create the graph, which is further simplified to remove duplicates and self loops
@@ -470,27 +466,13 @@ legend("topright", legend = col$country, pt.bg=col$color, bty="n",
 par(mar=c(5, 4, 4, 2) + 0.1)
 ```
 
-It is clear that the relative log-returns of the stocks are strongly(? WIP) correlated when they belong to the same country: the american stocks in our case are an example. It can be seen also that the relative log-returns of european stocks are correlated among them and with some american stocks, suggesting the hypothesis that the american market can partly influence the european one. The relative log-returns of the only two stocks from asian countries are correlated with no other stock, highlighting the degree of independence of their markets.
+The graph confirms and strengthens all of the precedent hypothesis. Additionally, it can be noticed that **the stocks tend to be correlated when they belong to the same country**: the american stocks in our case are an example. It can be seen that the european stocks are correlated among them and with some american stocks, suggesting that the american market and the european one often share the same economic patterns and politics. Though, Carrefour is (mildly) correlated with only five stocks among them, confirming its defensive nature. The only two stocks from asian countries are correlated with no other stock, highlighting the degree of independence of their markets.  
 
-### Bootstrap CIs for the Shapley Values
-WIP bla bla bla introduction
+The next step of our analysis is to use the theory above and **non-parametric bootstrap** to calculate confidence intervals for the Shapley value of each stock in the portfolio.  
+It is done by sampling with replacement the data from the original dataframe $B$ times and then by estimating the Shapley value for each stock (at every iteration). The number of iterations $B$ must be large, in our case 10000. The estimated Shapley values are used to calculate **percentile CIs** at level $\alpha = 0.05$.  
+As the log-returns of a stock are assumed to be distributed as a *Gaussian*, we've estimated the Shapley values by plugging in the sample mean as an estimator of the expected value. We've also used the covariance matrix derived from the correlation graph to get the needed covariance values.  
+As $\omega$ is a factor that represents the risk propensity (the more, the less is the risk taken), we've decided to compare the bootstrapped CIs obtained by considering three levels of it: 0.5,1 and 2.
 ```{r, echo=TRUE}
-# Bootstrap CIs for Shapley Values
-B = 10000 # Number of iterations for bootstrap
-n <- nrow(df)
-shap.B <- matrix(NA, nrow = B, ncol = ncol(df)) # Bootstrap B Shapley values for each stock
-dimnames(shap.B) <- list(1:B, colnames(df)) # Rename columns
-omega <- 0.5 # Select the risk propensity
-set.seed(4545) # Set seed for reproducibility
-# Main loop - non-parametric bootstrap for Shapley Values
-for (b in 1:B){
-  idx <-  sample(1:n, replace = T)
-  cov_mat <- matrix(ifelse(edges, cov(df[idx,]), 0), nrow = 10, ncol = 10) # Create a covariance matrix, fixing the covariance to zero for variables not linked in the correlation graph
-  for (j in 1:10){
-    shap.B[b,j] <- mean(df[idx,j]) - omega*sum(cov_mat[j,]) # Shapley formula, we use the sample mean as estimator of the expected value (assuming that the log-returns follow a normal distribution) and the adjacency matrix of the correlation graph to retrieve the covariance between the variables
-  }
-}
-
 # Calculate percentile CIs for the Shapley Values and store them in a matrix
 perc_int <- function(bootsamp, alpha){
   lows <- c(rep(NA,ncol(bootsamp)))
@@ -504,10 +486,31 @@ perc_int <- function(bootsamp, alpha){
   return(out)
 }
 
-shap_ci_perc <- perc_int(shap.B,0.05)
+shap_ci_perc <- list()
 
-# WIP - Prettify it
-knitr::kable(shap_ci_perc ,  caption = "Bootstrapped Confidence Intervals for the Shapley Value of each stock")
+# Bootstrap CIs for Shapley Values
+B = 10000 # Number of iterations for bootstrap
+n <- nrow(df)
+omega <- c(0.5,1,2) # Fix the risk propensity values
+set.seed(4545) # Set seed for reproducibility
+for (i in 1:3){
+  o <- omega[i]
+  shap.B <- matrix(NA, nrow = B, ncol = ncol(df)) # Bootstrap B Shapley values for each stock
+  dimnames(shap.B) <- list(1:B, colnames(df)) # Rename columns
+  # Non-parametric bootstrap for Shapley Values
+  for (b in 1:B){
+     idx <-  sample(1:n, replace = T)
+     cov_mat <- matrix(ifelse(edges, cov(df[idx,]), 0), nrow = 10, ncol = 10) # Create a covariance matrix, fixing the covariance to zero for variables not linked in the correlation graph
+     for (j in 1:10){
+       shap.B[b,j] <- mean(df[idx,j]) - o*sum(cov_mat[j,]) # Shapley formula, we use the sample mean as estimator of the expected value (assuming that the log-returns follow a normal distribution) and the adjacency matrix of the correlation graph to retrieve the covariance between the variables
+     }   
+  }
+  shap_ci_perc[[length(shap_ci_perc)+1]] <- perc_int(shap.B,0.05)
+}
+
+knitr::kable(shap_ci_perc[[1]] ,  caption = "Bootstrapped Confidence Intervals for the Shapley Value of each stock - omega 0.5")
+knitr::kable(shap_ci_perc [[2]] ,  caption = "Bootstrapped Confidence Intervals for the Shapley Value of each stock - omega 1")
+knitr::kable(shap_ci_perc[[3]] ,  caption = "Bootstrapped Confidence Intervals for the Shapley Value of each stock - omega 2")
 ```
 
-WIP - Write comment, test several values of omega and select alpha wisely. Also, check if the mean is ok to estimate the expected value of the log-returns. If the CI is strictly positive then the r.v. contributes hedging a risk and vice-versa. If zero is included nothing can be said. We assume that log-returns are normally distributed, hence the sample mean can be used to estimate their expected value
+The bootstrapped CIs tell us how much each stock contributes to the portfolio performance (e.g. hedge risks). It is clear that Cipla and Sumiseki Holdings contribute to hedge risks more than the other stocks in all the scenarios: this highlights the value of diversification, with them being the most uncorrelated stocks overall. Bayer, on the other side, doesn't hedge any risk in any scenario. We can see also how decreasing the risk propensity leads to having most of the confidence intervals to be negative: this means that the more volatile stocks are not preferred, as there is almost no negative profits to hedge. 
