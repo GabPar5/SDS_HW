@@ -1321,9 +1321,9 @@ sample mean as an estimator of the expected value. We’ve also used the
 covariance matrix derived from the correlation graph to get the needed
 covariance values.<br />
 As <span class="math inline">\(\omega\)</span> is a factor that
-represents the risk propensity, we’ve decided to compare the
-bootstrapped CIs obtained by considering three levels of it: 0.5,1 and
-2.</p>
+represents the risk propensity (the more, the less is the risk taken),
+we’ve decided to compare the bootstrapped CIs obtained by considering
+three levels of it: 0.5,1 and 2.</p>
 <pre class="r"><code># Calculate percentile CIs for the Shapley Values and store them in a matrix
 perc_int &lt;- function(bootsamp, alpha){
   lows &lt;- c(rep(NA,ncol(bootsamp)))
@@ -1551,12 +1551,17 @@ stock - omega 2</caption>
 </tr>
 </tbody>
 </table>
-<p>WIP - Write comment, test several values of omega and select alpha
-wisely. Also, check if the mean is ok to estimate the expected value of
-the log-returns. If the CI is strictly positive then the r.v.
-contributes hedging a risk and vice-versa. If zero is included nothing
-can be said. We assume that log-returns are normally distributed, hence
-the sample mean can be used to estimate their expected value</p>
+<p>The bootstrapped CIs tell us how much each stock contributes to the
+portfolio performance (e.g. hedge risks). It is clear that Cipla and
+Sumiseki Holdings contribute to hedge risks more than the other stocks
+in all the scenarios: this highlights the value of diversification, with
+them being the most uncorrelated stocks overall. Bayer, on the other
+side, doesn’t hedge any risk in any scenario. We can see also how
+decreasing the risk propensity leads to having most of the confidence
+intervals to be negative: this means that the more volatile stocks are
+not preferred. When there is a low risk propensity, even stocks such as
+Cipla and Sumiseki have got a mostly negative CI for the Shapley
+value.</p>
 </div>
 </div>
 
